@@ -18,17 +18,11 @@ $ cd ./photo_mosaic_creator/
 $ python main.py
 ```
 
-## Требования
+### Требования
 Для установки и запуска проекта, необходим [Python](https://www.python.org/downloads/) v3.14+
-и Pillow v12.0.0+
 
-
-## Установка зависимостей
+### Установка зависимостей
 Для установки зависимостей, выполните команду:
 ```sh
-$ pip install -r requirements.txt
+$ pip install Pillow
 ```
-## Примеры работы
-Можно посмотреть в ./output/.
-Файлы слишком большие и не могут быть отражены в README.MD
-
