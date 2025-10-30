@@ -97,10 +97,10 @@ class MosaicGenerator:
         
         return result_id
 
-    def get_mosaic_image(self, old_image):
+    def create_and_show_mosaic_image(self, old_image):
         #создает изображение new_image где пиксели в old_image заменены 
         #на ближайшие по среднему цвету изображения из images
-        #и возрвращает путь до него
+        #возрвращает путь до него и показывает изображение
         
         new_image_pixels = []
         new_image_width = old_image.width * self._images_width
@@ -123,16 +123,6 @@ class MosaicGenerator:
                 image_to_replace_pixel = self._images[new_image_pixels[i]]
                 new_image.paste( image_to_replace_pixel, (new_w, new_h) )
                 i += 1        
-        
-
-        # print(len(new_image_pixels))
-        # i = 0
-        # for h in range(0, new_image_height, self._images_height):
-        #     for w in range(0, new_image_width, self._images_width):   
-        #         print(h, w, i)           
-        #         image_to_replace_pixel = self._images[new_image_pixels[i]]
-        #         new_image.paste( image_to_replace_pixel, (w, h) )
-        #         i += 1
 
         output_image_name = f'{self._path_to_output_image}output_image_{self._output_image_counter}.jpg'
         while os.path.exists(output_image_name):
@@ -140,9 +130,10 @@ class MosaicGenerator:
             output_image_name = f'{self._path_to_output_image}output_image_{self._output_image_counter}.jpg'
 
         new_image.save(output_image_name)
+        new_image.show()
         return output_image_name      
 
 images = ImageLoader.get_images()
 mosaic_generator = MosaicGenerator(ImageLoader.resize_images(images))
 
-print(mosaic_generator.get_mosaic_image(images[0]))
+print(mosaic_generator.create_and_show_mosaic_image(images[0]))
