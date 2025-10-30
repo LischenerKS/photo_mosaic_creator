@@ -29,7 +29,7 @@ class ImageLoader:
         return images
 
 
-class MosaicGenerator:
+class MosaicCreator:
     #*класс для генерации мозайки
     
     def __init__(self, images, images_width=25, images_height=25, path_to_output_image = './output/'):
@@ -134,6 +134,6 @@ class MosaicGenerator:
         return output_image_name      
 
 images = ImageLoader.get_images()
-mosaic_generator = MosaicGenerator(ImageLoader.resize_images(images))
+mosaic_generator = MosaicCreator(ImageLoader.resize_images(images))
 
 print(mosaic_generator.create_and_show_mosaic_image(images[0]))
