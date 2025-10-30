@@ -3,8 +3,7 @@ import os
 import copy
 
 class ImageLoader:
-    #*содержит утилиты для загрузки изображений из указанной папки
-    #todo сделать проверку корректности пути и метод для его изменения 
+    #*класс содержит утилиты для загрузки изображений из указанной папки
     _PATH_TO_IMAGES = './images/'
 
     @classmethod
@@ -15,7 +14,7 @@ class ImageLoader:
         return images
 
     @classmethod
-    def get_images(cls) -> list[Image]:
+    def get_images_with_names(cls) -> list[list[str, Image]]:
         images = []
         image_names = os.listdir(cls._PATH_TO_IMAGES)
 
@@ -24,13 +23,13 @@ class ImageLoader:
 
             with Image.open(path_to_image) as img:
                 img.load()
-                images.append(img)
+                images.append( [image_name, img] )
         
         return images
 
 
 class MosaicCreator:
-    #*класс для генерации мозайки
+    #*класс для генерации мозаики
     
     def __init__(self, images, images_width=25, images_height=25, path_to_output_image = './output/'):
         self._images = images 
@@ -133,7 +132,20 @@ class MosaicCreator:
         new_image.show()
         return output_image_name      
 
-images = ImageLoader.get_images()
-mosaic_generator = MosaicCreator(ImageLoader.resize_images(images))
 
-print(mosaic_generator.create_and_show_mosaic_image(images[0]))
+
+if __name__ == '__main__':
+    images_with_names = ImageLoader.get_images_with_names()
+    
+    print('Положите свои изображения в директорию ./images/')
+    image_to_mosaic = input('Введите название файла из директории ./images/ по которому будет строиться мозаика: ')
+    
+    if not os.path.isfile(f'./images/{image_to_mosaic}'):
+        raise FileNotFoundError
+
+    images = [i[1] for i in images_with_names]
+    mosaic_generator = MosaicCreator(ImageLoader.resize_images(images))
+
+    print(mosaic_generator.create_and_show_mosaic_image( [i[1] for i in images_with_names if i[0] == image_to_mosaic][0] ))
+
+    
