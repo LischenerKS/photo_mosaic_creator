@@ -5,19 +5,43 @@ import copy
 class ImageLoader:
     #*класс содержит утилиты для загрузки изображений из указанной папки
 
-    def __init__(self, path_to_images):
-        self._PATH_TO_IMAGES = path_to_images
+    def _get_path_to_images(self) -> str:
+        path_to_images = input('Введите путь до директории с изображениями в формате или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
+    
+        if path_to_images == '':
+            path_to_images = './images/'
 
-    def resize_images(cls, images, width, height):
+        print(f'Изображения берутся из директории {path_to_images}', end='\n\n')
+        return path_to_images
+
+    def get_images_size(self) -> tuple[int, int]:
+        print('Каждое изображение будет приведено к одинаковому размеру')
+    
+        width = 25
+        height = 25
+
+        if input(f'Если хотите изменить размер по умолчанию ({width}, {height}) введите любой символ (иначе нажмите Enter) ') != '':
+            print('Не используйте слишком большой размер')
+            width = int(input('Введите ширину в пикселях '))
+            height = int(input('Введите высоту в пикселях '))
+
+        print(f'Все изображения будут приведены к размеру {width, height}', end='\n\n')
+        
+        return width, height
+
+    def __init__(self):
+        self._PATH_TO_IMAGES = self._get_path_to_images()
+
+    def resize_images(self, images, width, height):
         for i in range(len(images)):
             images[i] = images[i].resize( (width, height) )
 
-    def get_images_with_names(cls) -> list[list[str], list[Image]]:
+    def get_images_with_names(self) -> list[list[str], list[Image]]:
         images = [[], []]
-        image_names = os.listdir(cls._PATH_TO_IMAGES)
+        image_names = os.listdir(self._PATH_TO_IMAGES)
 
         for image_name in image_names:
-            path_to_image = f'{cls._PATH_TO_IMAGES}{image_name}'
+            path_to_image = f'{self._PATH_TO_IMAGES}{image_name}'
 
             with Image.open(path_to_image) as img:
                 img.load()
@@ -26,6 +50,14 @@ class ImageLoader:
 
         return images
 
+    def get_image_by_name(self, name) -> Image:
+        path = f'{self._PATH_TO_IMAGES}{name}'
+        
+        with Image.open(path) as img:
+            img.load()
+            image = img
+
+        return image
 
 class MosaicCreator:
     #*класс для генерации мозаики
@@ -99,7 +131,7 @@ class MosaicCreator:
         #создает изображение new_image где пиксели в old_image заменены 
         #на ближайшие по среднему цвету изображения из images
         #возрвращает путь до него и показывает изображение
-        
+
         new_image_pixels = []
         new_image_width = old_image.width * self._images_width
         new_image_height = old_image.height * self._images_height
@@ -134,37 +166,23 @@ class MosaicCreator:
 
 
 if __name__ == '__main__':
-    path_to_images = input('Введите путь до директории с изображениями в формате или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
+    image_loader = ImageLoader()
     
-    if path_to_images == '':
-        path_to_images = './images/'
-
-    image_loader = ImageLoader(path_to_images)
-
     images_with_names = image_loader.get_images_with_names()
     
-    print(f'Изображения берутся из директории {path_to_images}')
-    print('Каждое изображение будет приведено к одинаковому размеру')
-    
-    width = 300
-    height = 300
+    images_size = image_loader.get_images_size()
+    width = images_size[0]
+    height = images_size[1]
 
-    if input(f'Если хотите изменить размер по умолчанию ({width}, {height}) введите любой символ (иначе нажмите Enter) ') != '':
-        width = int(input('Введите ширину в пикселях '))
-        height = int(input('Введите высоту в пикселях '))
-
-    print(f'Все изображения будут приведены к размеру {width, height}')
     image_loader.resize_images(images_with_names[1], width, height)
 
-    image_to_mosaic = input(f'Введите название файла из директории {path_to_images} по которому будет строиться мозаика: ')
-    
-    if not os.path.isfile(f'{path_to_images}{image_to_mosaic}'):
-        raise FileNotFoundError
+    image_to_mosaic_name = input('Введите название файла из указанной директории по которому будет строиться мозаика: ')
 
     mosaic_generator = MosaicCreator(images_with_names[1], width, height)
-    path_to_output_image = mosaic_generator.create_and_show_mosaic_image()
+
+    image = image_loader.get_image_by_name(image_to_mosaic_name)
+
+    path_to_output_image = mosaic_generator.create_and_show_mosaic_image(image)
     print(path_to_output_image)
 
-    #Все фото должны иметь одинаковый размер с точностью до коэффициента иначе они кропнутся и получится залупа
-    #todo сделать чтобы фотки кропались а недостающие части заливало средним цветом
-    #todo купить витамины
+    
