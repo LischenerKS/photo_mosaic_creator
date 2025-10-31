@@ -8,14 +8,12 @@ class ImageLoader:
     def __init__(self, path_to_images):
         self._PATH_TO_IMAGES = path_to_images
 
-    def resize_images(cls, old_images, width=25, height=25)-> list[Image]:
-        images = copy.deepcopy(old_images)
-        for img in images:
-            img.thumbnail( (width, height) ) 
-        return images
+    def resize_images(cls, images, width, height):
+        for i in range(len(images)):
+            images[i] = images[i].resize( (width, height) )
 
-    def get_images_with_names(cls) -> list[list[str, Image]]:
-        images = []
+    def get_images_with_names(cls) -> list[list[str], list[Image]]:
+        images = [[], []]
         image_names = os.listdir(cls._PATH_TO_IMAGES)
 
         for image_name in image_names:
@@ -23,15 +21,16 @@ class ImageLoader:
 
             with Image.open(path_to_image) as img:
                 img.load()
-                images.append( [image_name, img] )
-        
+                images[0].append(image_name)
+                images[1].append(img)
+
         return images
 
 
 class MosaicCreator:
     #*класс для генерации мозаики
     
-    def __init__(self, images, images_width=25, images_height=25, path_to_output_image = './output/'):
+    def __init__(self, images, images_width, images_height, path_to_output_image = './output/'):
         self._images = images 
         self._avg_colors_images = self._get_avg_colors_array()
 
@@ -137,7 +136,7 @@ class MosaicCreator:
 if __name__ == '__main__':
     path_to_images = input('Введите путь до директории с изображениями в формате или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
     
-    if path_to_images == '\n':
+    if path_to_images == '':
         path_to_images = './images/'
 
     image_loader = ImageLoader(path_to_images)
@@ -145,18 +144,26 @@ if __name__ == '__main__':
     images_with_names = image_loader.get_images_with_names()
     
     print(f'Изображения берутся из директории {path_to_images}')
-    print('Корректная работа гарантируется только для квадратных изображений')
+    print('Каждое изображение будет приведено к одинаковому размеру')
+    
+    width = 300
+    height = 300
+
+    if input(f'Если хотите изменить размер по умолчанию ({width}, {height}) введите любой символ (иначе нажмите Enter) ') != '':
+        width = int(input('Введите ширину в пикселях '))
+        height = int(input('Введите высоту в пикселях '))
+
+    print(f'Все изображения будут приведены к размеру {width, height}')
+    image_loader.resize_images(images_with_names[1], width, height)
+
     image_to_mosaic = input(f'Введите название файла из директории {path_to_images} по которому будет строиться мозаика: ')
     
     if not os.path.isfile(f'{path_to_images}{image_to_mosaic}'):
         raise FileNotFoundError
 
-    images = [i[1] for i in images_with_names]
-    
-
-    mosaic_generator = MosaicCreator(image_loader.resize_images(images))
-
-    print(mosaic_generator.create_and_show_mosaic_image( [i[1] for i in images_with_names if i[0] == image_to_mosaic][0] ))
+    mosaic_generator = MosaicCreator(images_with_names[1], width, height)
+    path_to_output_image = mosaic_generator.create_and_show_mosaic_image()
+    print(path_to_output_image)
 
     #Все фото должны иметь одинаковый размер с точностью до коэффициента иначе они кропнутся и получится залупа
     #todo сделать чтобы фотки кропались а недостающие части заливало средним цветом
