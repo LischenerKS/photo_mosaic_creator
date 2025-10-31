@@ -2,7 +2,9 @@ from PIL import Image
 import os
 
 class ImageLoader:
-    #*класс содержит утилиты для загрузки изображений из указанной папки
+    """
+    класс содержит утилиты для загрузки изображений из указанной папки
+    """
 
     def _get_path_to_images(self) -> str:
         path_to_images = input('Введите путь до директории с изображениями в формате или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
@@ -59,7 +61,9 @@ class ImageLoader:
         return image
 
 class MosaicCreator:
-    #*класс для генерации мозаики
+    """
+    класс для генерации мозаики
+    """
     
     def __init__(self, images, images_width, images_height, path_to_output_image = './output/'):
         self._images = images 
@@ -71,7 +75,9 @@ class MosaicCreator:
         self._images_height = images_height
 
     def _get_avg_color_image(self, image) -> tuple[int, int, int]:
-        #метод возвращающий для изображения его средний цвет 
+        """
+        метод возвращающий для изображения его средний цвет
+        """
         r = 0
         g = 0
         b = 0
@@ -91,7 +97,9 @@ class MosaicCreator:
         return r, g, b
 
     def _get_avg_colors_array(self) -> list[tuple[int, int, int]]:
-        #метод возвращающий для self.images массив средних цветов 
+        """
+        метод возвращающий для self.images массив средних цветов
+        """
         avg_colors = []
         
         for image in self._images:
@@ -106,8 +114,10 @@ class MosaicCreator:
         return delta_r + delta_b + delta_g
 
     def _find_index_of_closest_by_avg_color_image(self, pixel) -> int:
-        #находит в self.avg_colors_images ближайшее по среднему цвету изображение
-        #к переданному pixel и возвращает его index
+        """
+        находит в self.avg_colors_images ближайшее по среднему цвету изображение
+        к переданному pixel и возвращает его index
+        """
 
         min_delta = 10**10
         result_id = -1
@@ -125,9 +135,11 @@ class MosaicCreator:
         return result_id
 
     def create_and_show_mosaic_image(self, old_image):
-        #создает изображение new_image где пиксели в old_image заменены 
-        #на ближайшие по среднему цвету изображения из images
-        #возрвращает путь до него и показывает изображение
+        """
+        создает изображение new_image где пиксели в old_image заменены 
+        на ближайшие по среднему цвету изображения из images
+        возрвращает путь до него и показывает изображение
+        """
 
         new_image_pixels = []
         new_image_width = old_image.width * self._images_width
