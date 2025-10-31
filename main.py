@@ -1,6 +1,5 @@
 from PIL import Image
 import os
-import copy
 
 class ImageLoader:
     #*класс содержит утилиты для загрузки изображений из указанной папки
