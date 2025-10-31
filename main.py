@@ -70,8 +70,6 @@ class MosaicCreator:
         self._images_width = images_width
         self._images_height = images_height
 
-        self._output_image_counter = 0
-
     def _get_avg_color_image(self, image) -> tuple[int, int, int]:
         #метод возвращающий для изображения его средний цвет 
         r = 0
@@ -151,12 +149,13 @@ class MosaicCreator:
                 new_h = h * self._images_height
                 image_to_replace_pixel = self._images[new_image_pixels[i]]
                 new_image.paste( image_to_replace_pixel, (new_w, new_h) )
-                i += 1        
-
-        output_image_name = f'{self._path_to_output_image}output_image_{self._output_image_counter}.jpg'
+                i += 1    
+                    
+        output_image_counter = 0
+        output_image_name = f'{self._path_to_output_image}output_image_{output_image_counter}.jpg'
         while os.path.exists(output_image_name):
-            self._output_image_counter += 1
-            output_image_name = f'{self._path_to_output_image}output_image_{self._output_image_counter}.jpg'
+            output_image_counter += 1
+            output_image_name = f'{self._path_to_output_image}output_image_{output_image_counter}.jpg'
 
         new_image.save(output_image_name)
         new_image.show()
