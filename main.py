@@ -90,7 +90,7 @@ class MosaicCreator:
         g //= count_pixels
         b //= count_pixels
 
-        return (r, g, b)
+        return r, g, b
 
     def _get_avg_colors_array(self) -> list[tuple[int, int, int]]:
         #метод возвращающий для self.images массив средних цветов 
