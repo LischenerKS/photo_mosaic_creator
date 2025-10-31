@@ -20,11 +20,13 @@ $ python main.py
 
 ## Требования
 Для установки и запуска проекта, необходим [Python](https://www.python.org/downloads/) v3.14+
+и Pillow v12.0.0+
+
 
 ## Установка зависимостей
 Для установки зависимостей, выполните команду:
 ```sh
-$ pip install Pillow
+$ pip install -r requirements.txt
 ```
 ## Примеры работы
 Можно посмотреть в ./output/.
