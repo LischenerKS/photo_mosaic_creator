@@ -4,16 +4,16 @@ import copy
 
 class ImageLoader:
     #*класс содержит утилиты для загрузки изображений из указанной папки
-    _PATH_TO_IMAGES = './images/'
 
-    @classmethod
+    def __init__(self, path_to_images):
+        self._PATH_TO_IMAGES = path_to_images
+
     def resize_images(cls, old_images, width=25, height=25)-> list[Image]:
         images = copy.deepcopy(old_images)
         for img in images:
             img.thumbnail( (width, height) ) 
         return images
 
-    @classmethod
     def get_images_with_names(cls) -> list[list[str, Image]]:
         images = []
         image_names = os.listdir(cls._PATH_TO_IMAGES)
@@ -135,17 +135,29 @@ class MosaicCreator:
 
 
 if __name__ == '__main__':
-    images_with_names = ImageLoader.get_images_with_names()
+    path_to_images = input('Введите путь до директории с изображениями в формате или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
     
-    print('Положите свои изображения в директорию ./images/')
-    image_to_mosaic = input('Введите название файла из директории ./images/ по которому будет строиться мозаика: ')
+    if path_to_images == '\n':
+        path_to_images = './images/'
+
+    image_loader = ImageLoader(path_to_images)
+
+    images_with_names = image_loader.get_images_with_names()
     
-    if not os.path.isfile(f'./images/{image_to_mosaic}'):
+    print(f'Изображения берутся из директории {path_to_images}')
+    print('Корректная работа гарантируется только для квадратных изображений')
+    image_to_mosaic = input(f'Введите название файла из директории {path_to_images} по которому будет строиться мозаика: ')
+    
+    if not os.path.isfile(f'{path_to_images}{image_to_mosaic}'):
         raise FileNotFoundError
 
     images = [i[1] for i in images_with_names]
-    mosaic_generator = MosaicCreator(ImageLoader.resize_images(images))
+    
+
+    mosaic_generator = MosaicCreator(image_loader.resize_images(images))
 
     print(mosaic_generator.create_and_show_mosaic_image( [i[1] for i in images_with_names if i[0] == image_to_mosaic][0] ))
 
-    
+    #Все фото должны иметь одинаковый размер с точностью до коэффициента иначе они кропнутся и получится залупа
+    #todo сделать чтобы фотки кропались а недостающие части заливало средним цветом
+    #todo купить витамины
