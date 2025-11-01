@@ -53,6 +53,9 @@ class ImageLoader:
     путь переданный в конструктор должен быть корректным
     """
 
+    def __init__(self, path_to_images):
+        self._PATH_TO_IMAGES = path_to_images
+        
     def get_images_size(self) -> tuple[int, int]:
         print('Каждое изображение будет приведено к одинаковому размеру')
     
@@ -67,9 +70,6 @@ class ImageLoader:
         print(f'Все изображения будут приведены к размеру {width, height}', end='\n\n')
         
         return width, height
-
-    def __init__(self, path_to_images):
-        self._PATH_TO_IMAGES = path_to_images
 
     def resize_images(self, images, width, height):
         for i in range(len(images)):
