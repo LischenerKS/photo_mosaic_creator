@@ -24,6 +24,10 @@ class UserInput:
 
         return path_to_images
 
+    @staticmethod #? Использование staticmetodа в данном случае обосновано?
+    def get_path_to_imagebase_for_mosaic():
+        pass
+        
 class ImageLoader:
     """
     класс содержит утилиты для загрузки изображений из указанной папки
@@ -57,7 +61,6 @@ class ImageLoader:
 
         for image_name in image_names:
             path_to_image = f'{self._PATH_TO_IMAGES}{image_name}'
-
             try:
                 with Image.open(path_to_image) as img:
                     img.load()
@@ -67,9 +70,12 @@ class ImageLoader:
                 print('Введенный путь некорректен. Перезапустите программу и попробуйте еще раз')
         return images
 
-    def get_image_by_name(self, name) -> Image:
-        path = f'{self._PATH_TO_IMAGES}{name}'
-        
+    def get_image_by_path(self, path) -> Image:
+        """
+        Возвращает Image по переданному пути
+        Путь должен быть корректным
+        """
+
         with Image.open(path) as img:
             img.load()
             image = img
@@ -208,7 +214,7 @@ if __name__ == '__main__':
 
     mosaic_generator = MosaicCreator(images_with_names[1], width, height)
 
-    image = image_loader.get_image_by_name(image_to_mosaic_name)
+    image = image_loader.get_image_by_path(image_to_mosaic_name)
     exit(0) #!
     path_to_output_image = mosaic_generator.create_and_show_mosaic_image(image)
     print(path_to_output_image)
