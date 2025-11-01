@@ -9,24 +9,50 @@ class UserInput:
     def get_path_to_images() -> str:
         """
         Запрашивает у пользователя путь до папки с изображениями
-        Если путь не существует, то вызывает саму себя.
+        Пытается прочитать список имен по указанному пути и открыть первое из списка как изображение
+        Если не удается, то вызывает саму себя пока не будет
+        указан корректный путь.
         """
 
         print('Введите путь до директории в формате ./(какой-то путь)/ ')
-        path_to_images = input('Или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
+        path_to_images_dir = input('Или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
     
-        if path_to_images == '':
-            path_to_images = './images/'
+        if path_to_images_dir == '':
+            path_to_images_dir = './images/'
 
-        if not os.path.isdir(path_to_images): 
-            print('Введенный путь некорректен, попробуйте заново:')
-            path_to_images = UserInput.get_path_to_images() 
+        try:
+            first_image_names = os.listdir(path_to_images_dir)[0]
+            Image.open(f'{path_to_images_dir}{first_image_names}').close()
+        except:
+            print('\nВведенный путь некорректен, попробуйте заново:')
+            path_to_images_dir = UserInput.get_path_to_images() 
 
-        return path_to_images
+        return path_to_images_dir
 
     @staticmethod #? Использование staticmetodа в данном случае обосновано?
-    def get_path_to_imagebase_for_mosaic():
-        pass
+    def get_path_to_imagebase_for_mosaic() -> str:
+        """
+        Запрашивает у пользователя путь до изображения, по которому строится мозаика
+        Если путь не существует, то вызывает саму себя пока не будет
+        указан корректный путь.
+        """
+        print('Необходимо указать путь до файла по которому будет строиться мозаика')
+        print('Путь должен указываться в формате ./(какой-то путь до директории/название файла.расширение)')
+        path_to_imagebase = input('Введите название файла: ')
+
+        # image_extensions = ['.jpg', '.jpeg', '.png']
+        # # is_file = os.path.isfile(path_to_imagebase)
+        # # is_extension_corrent = os.path.splitext(path_to_imagebase) in image_extensions
+        
+        # if not is_file:
+        #     print('Введенный путь некорректен, попробуйте заново:')
+        #     path_to_imagebase = UserInput.get_path_to_imagebase_for_mosaic()
+
+        # if not is_extension_corrent:
+        #     print('Расширение указанного файла не поддерживается')
+        #     print(f'Поддерживаемые расширения - {image_extensions}')
+
+        return path_to_imagebase
         
 class ImageLoader:
     """
@@ -61,13 +87,11 @@ class ImageLoader:
 
         for image_name in image_names:
             path_to_image = f'{self._PATH_TO_IMAGES}{image_name}'
-            try:
-                with Image.open(path_to_image) as img:
-                    img.load()
-                    images[0].append(image_name)
-                    images[1].append(img)
-            except:
-                print('Введенный путь некорректен. Перезапустите программу и попробуйте еще раз')
+            with Image.open(path_to_image) as img:
+                img.load()
+                images[0].append(image_name)
+                images[1].append(img)
+
         return images
 
     def get_image_by_path(self, path) -> Image:
@@ -210,11 +234,11 @@ if __name__ == '__main__':
 
     image_loader.resize_images(images_with_names[1], width, height)
 
-    image_to_mosaic_name = input('Введите название файла из указанной директории по которому будет строиться мозаика: ')
+    path_to_imagebase_for_mosaic = UserInput.get_path_to_imagebase_for_mosaic()
 
     mosaic_generator = MosaicCreator(images_with_names[1], width, height)
 
-    image = image_loader.get_image_by_path(image_to_mosaic_name)
+    image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
     exit(0) #!
     path_to_output_image = mosaic_generator.create_and_show_mosaic_image(image)
     print(path_to_output_image)
