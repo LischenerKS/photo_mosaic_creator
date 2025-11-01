@@ -5,8 +5,8 @@ class UserInput:
     """
     класс содержит утилиты для ввода и валидации данных от пользователя
     """
-    @staticmethod #? Использование staticmetodа в данном случае обосновано?
-    def get_path_to_images() -> str:
+
+    def get_path_to_images(self) -> str:
         """
         Запрашивает у пользователя путь до папки с изображениями
         Пытается прочитать список имен по указанному пути и открыть первое из списка как изображение
@@ -24,22 +24,21 @@ class UserInput:
             Image.open(f'{path_to_images_dir}{first_image_names}').close()
         except:
             print('\nВведенный путь некорректен, попробуйте заново:')
-            path_to_images_dir = UserInput.get_path_to_images() 
+            path_to_images_dir = self.get_path_to_images() 
 
         return path_to_images_dir
 
-    @staticmethod #? Использование staticmetodа в данном случае обосновано?
-    def get_path_to_imagebase_for_mosaic() -> str:
+    def get_path_to_imagebase_for_mosaic(self) -> str:
         """
         Запрашивает у пользователя путь до изображения, по которому строится мозаика
         Пытается открыть указанный файл как изображение. Если не удается, то вызывает
         самого себя пока не будет указан корректный путь.
         """
         message = """Необходимо указать путь до файла по которому будет строиться мозаика
-        Путь должен указываться в формате ./(какой-то путь до директории/название файла.расширение)
-        Конечный размер полученного изображения зависит от разрешения изображения по которому
-        строится мозаика. Использование исходного изображения со слишком большим разрешением вызовет
-        ошибку из-за недостатка памяти для работы программы"""
+Путь должен указываться в формате ./(какой-то путь до директории/название файла.расширение)
+Конечный размер полученного изображения зависит от разрешения изображения по которому
+строится мозаика. Использование исходного изображения со слишком большим разрешением вызовет
+ошибку из-за недостатка памяти для работы программы"""
         print(message)
         
         path_to_imagebase = input('Введите путь до файла: ')
@@ -48,7 +47,7 @@ class UserInput:
             Image.open(path_to_imagebase).close()
         except:
             print('\nВведенный путь некорректен или файл не поддерживается, попробуйте заново:')
-            path_to_imagebase = UserInput.get_path_to_imagebase_for_mosaic() 
+            path_to_imagebase = self.get_path_to_imagebase_for_mosaic() 
 
         return path_to_imagebase
         
@@ -222,7 +221,8 @@ class MosaicCreator:
 
 
 if __name__ == '__main__':
-    path_to_images = UserInput.get_path_to_images()
+    user_input = UserInput()
+    path_to_images = user_input.get_path_to_images()
     image_loader = ImageLoader(path_to_images)
     print(f'Изображения берутся из директории {path_to_images}', end='\n\n')
 
@@ -234,7 +234,7 @@ if __name__ == '__main__':
 
     image_loader.resize_images(images_with_names[1], width, height)
 
-    path_to_imagebase_for_mosaic = UserInput.get_path_to_imagebase_for_mosaic()
+    path_to_imagebase_for_mosaic = user_input.get_path_to_imagebase_for_mosaic()
 
     mosaic_generator = MosaicCreator(images_with_names[1], width, height)
 
