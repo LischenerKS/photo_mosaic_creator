@@ -50,6 +50,7 @@ class UserInput:
 class ImageLoader:
     """
     класс содержит утилиты для загрузки изображений из указанной папки
+    путь должен быть корректным
     """
 
     def get_images_size(self) -> tuple[int, int]:
