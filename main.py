@@ -180,6 +180,7 @@ class MosaicCreator:
         на ближайшие по среднему цвету изображения из images
         возрвращает путь до него и показывает изображение
         """
+        print('\nГенерация мозаики начата')
 
         new_image_pixels = []
         new_image_width = old_image.width * self._images_width
@@ -233,7 +234,7 @@ if __name__ == '__main__':
     mosaic_generator = MosaicCreator(images_with_names[1], width, height)
 
     image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
-    exit(0) #!
+
     path_to_output_image = mosaic_generator.create_and_show_mosaic_image(image)
     print(path_to_output_image)
 
