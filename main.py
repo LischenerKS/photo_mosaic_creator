@@ -1,19 +1,33 @@
 from PIL import Image
 import os
 
-class ImageLoader:
+class UserInput:
     """
-    класс содержит утилиты для загрузки изображений из указанной папки
+    класс содержит утилиты для ввода и валидации данных от пользователя
     """
+    @staticmethod #? Использование staticmetodа в данном случае обосновано?
+    def get_path_to_images() -> str:
+        """
+        Запрашивает у пользователя путь до папки с изображениями
+        Если путь не существует, то вызывает саму себя.
+        """
 
-    def _get_path_to_images(self) -> str:
-        path_to_images = input('Введите путь до директории с изображениями в формате или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
+        print('Введите путь до директории в формате ./(какой-то путь)/ ')
+        path_to_images = input('Или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
     
         if path_to_images == '':
             path_to_images = './images/'
 
-        print(f'Изображения берутся из директории {path_to_images}', end='\n\n')
+        if not os.path.isdir(path_to_images): 
+            print('Введенный путь некорректен, попробуйте заново:')
+            path_to_images = UserInput.get_path_to_images() 
+
         return path_to_images
+
+class ImageLoader:
+    """
+    класс содержит утилиты для загрузки изображений из указанной папки
+    """
 
     def get_images_size(self) -> tuple[int, int]:
         print('Каждое изображение будет приведено к одинаковому размеру')
@@ -30,8 +44,8 @@ class ImageLoader:
         
         return width, height
 
-    def __init__(self):
-        self._PATH_TO_IMAGES = self._get_path_to_images()
+    def __init__(self, path_to_images):
+        self._PATH_TO_IMAGES = path_to_images
 
     def resize_images(self, images, width, height):
         for i in range(len(images)):
@@ -44,11 +58,13 @@ class ImageLoader:
         for image_name in image_names:
             path_to_image = f'{self._PATH_TO_IMAGES}{image_name}'
 
-            with Image.open(path_to_image) as img:
-                img.load()
-                images[0].append(image_name)
-                images[1].append(img)
-
+            try:
+                with Image.open(path_to_image) as img:
+                    img.load()
+                    images[0].append(image_name)
+                    images[1].append(img)
+            except:
+                print('Введенный путь некорректен. Перезапустите программу и попробуйте еще раз')
         return images
 
     def get_image_by_name(self, name) -> Image:
@@ -176,8 +192,10 @@ class MosaicCreator:
 
 
 if __name__ == '__main__':
-    image_loader = ImageLoader()
-    
+    path_to_images = UserInput.get_path_to_images()
+    image_loader = ImageLoader(path_to_images)
+    print(f'Изображения берутся из директории {path_to_images}', end='\n\n')
+
     images_with_names = image_loader.get_images_with_names()
     
     images_size = image_loader.get_images_size()
@@ -191,7 +209,7 @@ if __name__ == '__main__':
     mosaic_generator = MosaicCreator(images_with_names[1], width, height)
 
     image = image_loader.get_image_by_name(image_to_mosaic_name)
-
+    exit(0) #!
     path_to_output_image = mosaic_generator.create_and_show_mosaic_image(image)
     print(path_to_output_image)
 
