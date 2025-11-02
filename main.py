@@ -108,7 +108,7 @@ class ImageLoader:
     def __init__(self, path_to_images):
         self._PATH_TO_IMAGES = path_to_images
 
-    def resize_images(self, images, width, height):
+    def resize_images(self, images, width, height) -> None:
         width = 25
         height = 15
         for i in range(len(images)):
@@ -213,7 +213,7 @@ class MosaicCreator:
         
         return result_id
 
-    def create_and_show_mosaic_image(self, old_image):
+    def create_and_show_mosaic_image(self, old_image) -> str:
         """
         создает изображение new_image где пиксели в old_image заменены 
         на ближайшие по среднему цвету изображения из images
