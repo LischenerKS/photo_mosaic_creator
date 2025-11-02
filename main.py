@@ -109,8 +109,6 @@ class ImageLoader:
         self._PATH_TO_IMAGES = path_to_images
 
     def resize_images(self, images, width, height) -> None:
-        width = 25
-        height = 15
         for i in range(len(images)):
             images[i] = images[i].resize( (width, height) )
 
