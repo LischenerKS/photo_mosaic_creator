@@ -6,6 +6,29 @@ class UserInput:
     Класс содержит утилиты для ввода и валидации данных от пользователя
     """
 
+    def get_images_size(self) -> tuple[int, int]:
+        """
+        Запрашивает размер к которому будут приведены изображения, замещающие пиксели в мозаике.
+        Соотношение сторон должно быть равно 1
+        """
+        print('Каждое изображение будет приведено к одинаковому размеру')
+    
+        width = 50
+        height = 50
+
+        if input(f'Если хотите изменить размер по умолчанию ({width}, {height}) введите любой символ (иначе нажмите Enter) ') != '':
+            print('Не используйте слишком большой размер, соотношение сторон должно быть равно 1')
+            width = int(input('Введите ширину в пикселях '))
+            height = int(input('Введите высоту в пикселях '))
+        
+        if width != height:
+            print('\nСоотношение сторон должно быть равно 1, попробуйте еще раз:')
+            width, height = self.get_images_size()
+
+        print(f'Все изображения будут приведены к размеру {width, height}', end='\n\n')
+        
+        return width, height
+
     def get_path_to_images(self) -> str:
         """
         Запрашивает у пользователя путь до папки с изображениями.
@@ -64,23 +87,10 @@ class ImageLoader:
 
     def __init__(self, path_to_images):
         self._PATH_TO_IMAGES = path_to_images
-        
-    def get_images_size(self) -> tuple[int, int]:
-        print('Каждое изображение будет приведено к одинаковому размеру')
-    
-        width = 25
-        height = 25
-
-        if input(f'Если хотите изменить размер по умолчанию ({width}, {height}) введите любой символ (иначе нажмите Enter) ') != '':
-            print('Не используйте слишком большой размер')
-            width = int(input('Введите ширину в пикселях '))
-            height = int(input('Введите высоту в пикселях '))
-
-        print(f'Все изображения будут приведены к размеру {width, height}', end='\n\n')
-        
-        return width, height
 
     def resize_images(self, images, width, height):
+        width = 25
+        height = 15
         for i in range(len(images)):
             images[i] = images[i].resize( (width, height) )
 
@@ -233,7 +243,7 @@ if __name__ == '__main__':
 
     images_with_names = image_loader.get_images_with_names()
     
-    images_size = image_loader.get_images_size()
+    images_size = user_input.get_images_size()
     width = images_size[0]
     height = images_size[1]
 
