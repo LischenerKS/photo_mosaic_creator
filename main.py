@@ -6,6 +6,19 @@ class UserInput:
     Класс содержит утилиты для ввода и валидации данных от пользователя
     """
 
+    def _is_int_positive_number(self, num) -> bool:
+        """
+        Возвращает True, если num - целое положительное число
+        Иначе возвращает False
+        """
+        try:
+            if int(num) > 0:
+                return True
+            else:
+                return False
+        except:
+            return False
+
     def get_images_size(self) -> tuple[int, int]:
         """
         Запрашивает размер к которому будут приведены изображения, замещающие пиксели в мозаике.
@@ -19,8 +32,16 @@ class UserInput:
         input_message = f'Если хотите изменить размер по умолчанию ({width}, {height}) введите любой символ + Enter (иначе нажмите Enter) '
         if input(input_message) != '':
             print('Не используйте слишком большой размер, соотношение сторон должно быть равно 1')
-            width = int(input('Введите ширину в пикселях '))
-            height = int(input('Введите высоту в пикселях '))
+            
+            width = input('Введите ширину в пикселях ')
+            height = input('Введите высоту в пикселях ')
+        
+        if not self._is_int_positive_number(width) or not self._is_int_positive_number(height):
+            print('\nШирина и высота должны быть целыми положительными числами')
+            width, height = self.get_images_size()
+
+        width = int(width)
+        height = int(height)
         
         if width != height:
             print('\nСоотношение сторон должно быть равно 1, попробуйте еще раз:')
