@@ -79,8 +79,8 @@ class ImageLoader:
         for i in range(len(images)):
             images[i] = images[i].resize( (width, height) )
 
-    def get_images_with_names(self) -> list[list[str], list[Image]]:
-        images = [[], []]
+    def get_images_with_names(self) -> tuple[list[str], list[Image]]:
+        images = ([], [])
         image_names = os.listdir(self._PATH_TO_IMAGES)
 
         for image_name in image_names:
