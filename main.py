@@ -46,8 +46,6 @@ class UserInput:
         if width != height:
             print('\nСоотношение сторон должно быть равно 1, попробуйте еще раз:')
             width, height = self.get_images_size()
-
-        print(f'Все изображения будут приведены к размеру {width, height}', end='\n\n')
         
         return width, height
 
@@ -268,6 +266,7 @@ if __name__ == '__main__':
     images_size = user_input.get_images_size()
     width = images_size[0]
     height = images_size[1]
+    print(f'Все изображения будут приведены к размеру {width, height}', end='\n\n')
 
     image_loader.resize_images(images_with_names[1], width, height)
 
