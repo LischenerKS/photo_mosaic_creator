@@ -3,27 +3,32 @@ import os
 
 class UserInput:
     """
-    класс содержит утилиты для ввода и валидации данных от пользователя
+    Класс содержит утилиты для ввода и валидации данных от пользователя
     """
 
     def get_path_to_images(self) -> str:
         """
-        Запрашивает у пользователя путь до папки с изображениями
-        Пытается прочитать список имен по указанному пути и открыть первое из списка как изображение
+        Запрашивает у пользователя путь до папки с изображениями.
+        Пытается прочитать список имен по указанному пути и открыть первое из списка как изображение.
         Если не удается, то вызывает самого себя пока не будет указан корректный путь.
         """
 
-        print('Введите путь до директории в формате ./(какой-то путь)/ ')
+        message = """Введите путь до директории в формате ./(какой-то путь)/
+        В указанной директории должны быть только изображения.
+        """
+        print(message)
         path_to_images_dir = input('Или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
     
         if path_to_images_dir == '':
             path_to_images_dir = './images/'
 
         try:
-            first_image_names = os.listdir(path_to_images_dir)[0]
-            Image.open(f'{path_to_images_dir}{first_image_names}').close()
+            image_names = os.listdir(path_to_images_dir)
+            for image_name in image_names:
+                Image.open(f'{path_to_images_dir}{image_name}').close()
         except:
-            print('\nВведенный путь некорректен, попробуйте заново:')
+            error_message = '\nВведенный путь некорректен или в папке есть не поддерживаемые файлы, попробуйте заново:'
+            print(error_message)
             path_to_images_dir = self.get_path_to_images() 
 
         return path_to_images_dir
