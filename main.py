@@ -1,5 +1,183 @@
 from PIL import Image
 import os
+from abc import ABC, abstractmethod
+import argparse
+
+class InputValidator:
+
+    def __init__(self, args: dict):
+        self.args = args
+        self.incorrect_args = []
+
+    def check_args(self) -> None:
+        """
+        Вызывает методы для проверки self.args
+        Если аргумент(ы) некорректны, то выводит пользователю какие из аргументов некорректны
+        и останавливает выполнение всей программы.
+        """
+
+        self.check_path_to_imagebase_for_mosaic_correct()
+        self.check_path_to_images_correct()
+        self.check_path_to_output_image_dir()
+        self.check_size_of_replaced_pixel()
+        self.check_width_of_output_image()
+        self.check_height_of_output_image()
+
+        if self.incorrect_args != []:
+            for inc_arg in self.incorrect_args:
+                print(f'Аргумент {inc_arg} введен неверно!')
+            print('Попробуйте еще раз.')
+            exit()
+
+    def check_path_to_imagebase_for_mosaic_correct(self) -> None:
+        """
+        Пытается получить из self.args path_to_imagebase_for_mosaic
+        и открыть указанный файл как изображение. 
+        Если файл не удалось открыть, то добавляет в self.incorrect_args
+        строку 'path_to_imagebase_for_mosaic'.
+        Если файл удалось открыть, то ничего не делает.
+        """
+        try:
+            path_to_imagebase_for_mosaic = self.args['path_to_imagebase_for_mosaic']
+            Image.open(path_to_imagebase_for_mosaic).close()
+        except:
+            self.incorrect_args.append['path_to_imagebase_for_mosaic']
+ 
+    def check_path_to_images_correct(self) -> None:
+        """
+        Пытается получить из self.args path_to_images_dir,
+        прочитать список имен по полученному пути
+        и открыть каждое из списка как изображение.
+        Если хотя бы один файл не удалось открыть, то добавляет 
+        в self.incorrect_args строку 'path_to_images_dir'.
+        Если каждый файл удалось открыть, то ничего не делает.
+        """
+        try:
+            path_to_images_dir = self.args['path_to_images_dir']
+            image_names = os.listdir(path_to_images_dir)
+            for image_name in image_names:
+                Image.open(f'{path_to_images_dir}{image_name}').close()
+        except:
+            self.incorrect_args.append['path_to_images_dir']
+        
+    def check_path_to_output_image_dir(self) -> None:
+            """
+            Пытается получить из self.args path_to_output_image_dir,
+            и проверить что директория существует.
+            Если получить аргумент не удалось или директории не существует,
+            то добавляет в self.incorrect_args строку 'path_to_output_image_dir'.
+            Иначе ничего не делает.
+            """
+            #todo добавить проверку на права для директории
+            #todo добавить проверку на то что строка оканчивается на /
+            try:
+                path_to_output_image_dir = self.args['path_to_output_image_dir']
+                if not os.path.isdir(path_to_output_image_dir):
+                    self.incorrect_args.append['path_to_output_image_dir']
+            except:
+                self.incorrect_args.append['path_to_output_image_dir']
+
+    def check_size_of_replaced_pixel(self) -> None:
+        """
+        Пытается получить из self.args size_of_replaced_pixel
+        и проверить что это целое положительное число
+        Если проверка не выполняется или оказывается ложной, то добавляет
+        в self.incorrect_args строку 'size_of_replaced_pixel'.
+        Иначе ничего не делает.
+        """
+        try:
+            size_of_replaced_pixel = self.args['size_of_replaced_pixel']
+            if not (int(size_of_replaced_pixel) > 0):
+                self.incorrect_args.append['size_of_replaced_pixel']
+        except:
+            self.incorrect_args.append['size_of_replaced_pixel']
+
+    def check_width_of_output_image(self) -> None:
+        """
+        Пытается получить из self.args 
+        width_of_output_image и проверить что он является целым положительным числом
+        Если проверка не выполняется или оказывается ложной, то добавляет
+        в self.incorrect_args строку 'width_of_output_image'.
+        Иначе ничего не делает.
+        """
+        try:
+            width_of_output_image = self.args['width_of_output_image']
+            if not (int(width_of_output_image) > 0):
+                self.incorrect_args.append['width_of_output_image']
+        except:
+            self.incorrect_args.append['width_of_output_image']    
+
+    def check_height_of_output_image(self) -> None:
+        """
+        Пытается получить из self.args 
+        height_of_output_image и проверить что он является целым положительным числом
+        Если проверка не выполняется или оказывается ложной, то добавляет
+        в self.incorrect_args строку 'height_of_output_image'.
+        Иначе ничего не делает.
+        """
+        try:
+            height_of_output_image = self.args['height_of_output_image']
+            if not (int(height_of_output_image) > 0):
+                self.incorrect_args.append['height_of_output_image']
+        except:
+            self.incorrect_args.append['height_of_output_image']    
+
+class ArgsParser(ABC):
+    """
+    Абстрактный класс парсера аргументов 
+    """
+    @abstractmethod
+    def get_args(self) -> dict:
+        pass
+
+class CLIArgsParser(ArgsParser):
+    """
+    Класс для парсинга аргументов из командной строки
+    """
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(description='Строит мозаику по выбранным изображениям', exit_on_error=False)
+
+        self.parser.add_argument('path_to_imagebase_for_mosaic', type=str,\
+                            help='Путь до изображения, по которому строится мозаика')
+        
+        self.parser.add_argument('-indir', '--path_to_images', type=str, help='Путь до директории, в которой находятся \
+                            изображения, которые будут заменять пиксели', required=True)
+        
+        self.parser.add_argument('-outdir', '--path_to_output_image_dir', type=str, help='Путь до директории, в которой \
+                            сохранится результат работы программы', required=True)
+        
+        self.parser.add_argument('-srp', '--size_of_replaced_pixel', type=int, help='размер изображения, которое будет \
+                            заменять пиксель', default=50, required=False)
+        
+        self.parser.add_argument('-woi', '--width_of_output_image', type=int, help='ширина полученного изображения в \
+                                 замененных пикселях', required=False)
+        
+        self.parser.add_argument('-hoi', '--height_of_output_image', type=int, help='высота полученного изображения в \
+                                 замененных пикселях', required=False)
+        
+        self.parser.add_argument('-?', '--show_help', action='help', help='Показать справку')
+    
+    def get_args(self) -> dict:
+        try:        
+            args = self.parser.parse_args()
+            
+            args_dictionary = dict()
+            args_dictionary['path_to_imagebase_for_mosaic'] = args.path_to_imagebase_for_mosaic
+            args_dictionary['path_to_images'] = args.path_to_images
+            args_dictionary['path_to_output_image_dir'] = args.path_to_output_image_dir
+            args_dictionary['size_of_replaced_pixel'] = args.size_of_replaced_pixel
+            args_dictionary['width_of_output_image'] = args.width_of_output_image
+            args_dictionary['height_of_output_image'] = args.height_of_output_image
+            
+            cur_input_validator = InputValidator()
+            cur_input_validator.check_args()
+            
+            print(args_dictionary)
+
+        except argparse.ArgumentError:
+            print('Ошибка в аргументах, попробуйте еще раз.\n')
+            self.parser.print_help()
+            exit()
 
 class UserInput:
     """
@@ -52,7 +230,7 @@ class UserInput:
     def get_path_to_images(self) -> str:
         """
         Запрашивает у пользователя путь до папки с изображениями.
-        Пытается прочитать список имен по указанному пути и открыть первое из списка как изображение.
+        Пытается прочитать список имен по указанному пути и открыть каждое из списка как изображение.
         Если не удается, то вызывает самого себя пока не будет указан корректный путь.
         """
 
@@ -252,8 +430,11 @@ class MosaicCreator:
         return output_image_name      
 
 
-
 if __name__ == '__main__':
+    argparser = CLIArgsParser()
+    print(argparser.get_args())
+    exit(0)
+
     user_input = UserInput()
     path_to_images = user_input.get_path_to_images()
     image_loader = ImageLoader(path_to_images)
