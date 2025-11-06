@@ -183,104 +183,6 @@ class CLIArgsParser(ArgsParser):
             self.parser.print_help()
             exit()
 
-class UserInput:
-    """
-    Класс содержит утилиты для ввода и валидации данных от пользователя
-    """
-
-    def _is_int_positive_number(self, num) -> bool:
-        """
-        Возвращает True, если num - целое положительное число
-        Иначе возвращает False
-        """
-        try:
-            if int(num) > 0:
-                return True
-            else:
-                return False
-        except:
-            return False
-
-    def get_images_size(self) -> tuple[int, int]:
-        """
-        Запрашивает размер к которому будут приведены изображения, замещающие пиксели в мозаике.
-        Соотношение сторон должно быть равно 1
-        """
-        print('Каждое изображение будет приведено к одинаковому размеру')
-    
-        width = 50
-        height = 50
-
-        input_message = f'Если хотите изменить размер по умолчанию ({width}, {height}) введите любой символ + Enter (иначе нажмите Enter) '
-        if input(input_message) != '':
-            print('Не используйте слишком большой размер, соотношение сторон должно быть равно 1')
-            
-            width = input('Введите ширину в пикселях ')
-            height = input('Введите высоту в пикселях ')
-        
-        if not self._is_int_positive_number(width) or not self._is_int_positive_number(height):
-            print('\nШирина и высота должны быть целыми положительными числами')
-            width, height = self.get_images_size()
-
-        width = int(width)
-        height = int(height)
-        
-        if width != height:
-            print('\nСоотношение сторон должно быть равно 1, попробуйте еще раз:')
-            width, height = self.get_images_size()
-        
-        return width, height
-
-    def get_path_to_images(self) -> str:
-        """
-        Запрашивает у пользователя путь до папки с изображениями.
-        Пытается прочитать список имен по указанному пути и открыть каждое из списка как изображение.
-        Если не удается, то вызывает самого себя пока не будет указан корректный путь.
-        """
-
-        message = """Введите путь до директории в формате ./(какой-то путь)/
-В указанной директории должны быть только изображения.
-        """
-        print(message)
-        path_to_images_dir = input('Или нажмите Enter чтобы оставить ./images/ по умолчанию: ')
-    
-        if path_to_images_dir == '':
-            path_to_images_dir = './images/'
-
-        try:
-            image_names = os.listdir(path_to_images_dir)
-            for image_name in image_names:
-                Image.open(f'{path_to_images_dir}{image_name}').close()
-        except:
-            error_message = '\nВведенный путь некорректен или в папке есть не поддерживаемые файлы, попробуйте заново:'
-            print(error_message)
-            path_to_images_dir = self.get_path_to_images() 
-
-        return path_to_images_dir
-
-    def get_path_to_imagebase_for_mosaic(self) -> str:
-        """
-        Запрашивает у пользователя путь до изображения, по которому строится мозаика
-        Пытается открыть указанный файл как изображение. Если не удается, то вызывает
-        самого себя пока не будет указан корректный путь.
-        """
-        message = """Необходимо указать путь до файла по которому будет строиться мозаика
-Путь должен указываться в формате ./(какой-то путь до директории/название файла.расширение)
-Конечный размер полученного изображения зависит от разрешения изображения по которому
-строится мозаика. Использование исходного изображения со слишком большим разрешением вызовет
-ошибку из-за недостатка памяти для работы программы"""
-        print(message)
-        
-        path_to_imagebase = input('Введите путь до файла: ')
-
-        try:
-            Image.open(path_to_imagebase).close()
-        except:
-            print('\nВведенный путь некорректен или файл не поддерживается, попробуйте заново:')
-            path_to_imagebase = self.get_path_to_imagebase_for_mosaic() 
-
-        return path_to_imagebase
-        
 class ImageLoader:
     """
     класс содержит утилиты для загрузки изображений из указанной папки
@@ -397,7 +299,7 @@ class MosaicCreator:
         """
         создает изображение new_image где пиксели в old_image заменены 
         на ближайшие по среднему цвету изображения из images
-        возрвращает путь до него и показывает изображение
+        возравращает путь до него
         """
         print('\nГенерация мозаики начата')
 
@@ -430,33 +332,26 @@ class MosaicCreator:
             output_image_name = f'{self._path_to_output_image}output_image_{output_image_counter}.jpg'
 
         new_image.save(output_image_name)
-        new_image.show()
         return output_image_name      
 
 
 if __name__ == '__main__':
     argparser = CLIArgsParser()
-    print(argparser.get_args())
-    exit(0)
+    args = argparser.get_args() 
+    print(args)
+    exit()
 
-    user_input = UserInput()
-    path_to_images = user_input.get_path_to_images()
-    image_loader = ImageLoader(path_to_images)
-    print(f'Изображения берутся из директории {path_to_images}', end='\n\n')
-
+    image_loader = ImageLoader(args['path_to_images'])
     images_with_names = image_loader.get_images_with_names()
-    
-    images_size = user_input.get_images_size()
-    width = images_size[0]
-    height = images_size[1]
-    print(f'Все изображения будут приведены к размеру {width, height}', end='\n\n')
 
+    width = args['width_of_output_image']
+    height = args['height_of_output_image']
     image_loader.resize_images(images_with_names[1], width, height)
 
-    path_to_imagebase_for_mosaic = user_input.get_path_to_imagebase_for_mosaic()
-
+    
     mosaic_generator = MosaicCreator(images_with_names[1], width, height)
 
+    path_to_imagebase_for_mosaic = args['path_to_imagebase_for_mosaic']
     image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
 
     path_to_output_image = mosaic_generator.create_and_show_mosaic_image(image)
