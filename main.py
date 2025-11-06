@@ -41,7 +41,7 @@ class InputValidator:
             path_to_imagebase_for_mosaic = self.args['path_to_imagebase_for_mosaic']
             Image.open(path_to_imagebase_for_mosaic).close()
         except:
-            self.incorrect_args.append['path_to_imagebase_for_mosaic']
+            self.incorrect_args.append('path_to_imagebase_for_mosaic')
  
     def check_path_to_images_correct(self) -> None:
         """
@@ -53,12 +53,12 @@ class InputValidator:
         Если каждый файл удалось открыть, то ничего не делает.
         """
         try:
-            path_to_images_dir = self.args['path_to_images_dir']
+            path_to_images_dir = self.args['path_to_images']
             image_names = os.listdir(path_to_images_dir)
             for image_name in image_names:
                 Image.open(f'{path_to_images_dir}{image_name}').close()
         except:
-            self.incorrect_args.append['path_to_images_dir']
+            self.incorrect_args.append('path_to_images_dir')
         
     def check_path_to_output_image_dir(self) -> None:
             """
@@ -73,9 +73,9 @@ class InputValidator:
             try:
                 path_to_output_image_dir = self.args['path_to_output_image_dir']
                 if not os.path.isdir(path_to_output_image_dir):
-                    self.incorrect_args.append['path_to_output_image_dir']
+                    self.incorrect_args.append('path_to_output_image_dir')
             except:
-                self.incorrect_args.append['path_to_output_image_dir']
+                self.incorrect_args.append('path_to_output_image_dir')
 
     def check_size_of_replaced_pixel(self) -> None:
         """
@@ -88,39 +88,43 @@ class InputValidator:
         try:
             size_of_replaced_pixel = self.args['size_of_replaced_pixel']
             if not (int(size_of_replaced_pixel) > 0):
-                self.incorrect_args.append['size_of_replaced_pixel']
+                self.incorrect_args.append('size_of_replaced_pixel')
         except:
-            self.incorrect_args.append['size_of_replaced_pixel']
+            self.incorrect_args.append('size_of_replaced_pixel')
 
     def check_width_of_output_image(self) -> None:
         """
         Пытается получить из self.args 
-        width_of_output_image и проверить что он является целым положительным числом
+        width_of_output_image и проверить что он является целым положительным числом или None
         Если проверка не выполняется или оказывается ложной, то добавляет
         в self.incorrect_args строку 'width_of_output_image'.
         Иначе ничего не делает.
         """
         try:
             width_of_output_image = self.args['width_of_output_image']
-            if not (int(width_of_output_image) > 0):
-                self.incorrect_args.append['width_of_output_image']
+            if width_of_output_image is None or int(width_of_output_image) > 0:
+                pass #correct
+            else:
+                self.incorrect_args.append('width_of_output_image')
         except:
-            self.incorrect_args.append['width_of_output_image']    
+            self.incorrect_args.append('width_of_output_image') 
 
     def check_height_of_output_image(self) -> None:
         """
         Пытается получить из self.args 
-        height_of_output_image и проверить что он является целым положительным числом
+        height_of_output_image и проверить что он является целым положительным числом или None
         Если проверка не выполняется или оказывается ложной, то добавляет
         в self.incorrect_args строку 'height_of_output_image'.
         Иначе ничего не делает.
         """
         try:
             height_of_output_image = self.args['height_of_output_image']
-            if not (int(height_of_output_image) > 0):
-                self.incorrect_args.append['height_of_output_image']
+            if height_of_output_image is None or int(height_of_output_image) > 0:
+                pass #correct
+            else:
+                self.incorrect_args.append('height_of_output_image')
         except:
-            self.incorrect_args.append['height_of_output_image']    
+            self.incorrect_args.append('height_of_output_image')
 
 class ArgsParser(ABC):
     """
@@ -141,10 +145,10 @@ class CLIArgsParser(ArgsParser):
                             help='Путь до изображения, по которому строится мозаика')
         
         self.parser.add_argument('-indir', '--path_to_images', type=str, help='Путь до директории, в которой находятся \
-                            изображения, которые будут заменять пиксели', required=True)
+                            изображения, которые будут заменять пиксели. Должен оканчиваться на /', required=True)
         
         self.parser.add_argument('-outdir', '--path_to_output_image_dir', type=str, help='Путь до директории, в которой \
-                            сохранится результат работы программы', required=True)
+                            сохранится результат работы программы. Должен оканчиваться на /', required=True)
         
         self.parser.add_argument('-srp', '--size_of_replaced_pixel', type=int, help='размер изображения, которое будет \
                             заменять пиксель', default=50, required=False)
@@ -169,10 +173,10 @@ class CLIArgsParser(ArgsParser):
             args_dictionary['width_of_output_image'] = args.width_of_output_image
             args_dictionary['height_of_output_image'] = args.height_of_output_image
             
-            cur_input_validator = InputValidator()
+            cur_input_validator = InputValidator(args=args_dictionary)
             cur_input_validator.check_args()
             
-            print(args_dictionary)
+            return args_dictionary
 
         except argparse.ArgumentError:
             print('Ошибка в аргументах, попробуйте еще раз.\n')
