@@ -134,6 +134,29 @@ class ArgsParser(ABC):
     def get_args(self) -> dict:
         pass
 
+    def calculate_output_image_size(self, orig_w: int, orig_h: int) -> dict:
+        args_with_new_image_size = self.args_dictionary.copy()
+
+        if (args_with_new_image_size['width_of_output_image'] is None) \
+        and (args_with_new_image_size['height_of_output_image'] is None):
+            args_with_new_image_size['width_of_output_image'] = orig_w * 10
+            args_with_new_image_size['height_of_output_image'] = orig_h * 10
+        
+        elif args_with_new_image_size['width_of_output_image'] is None:
+            args_with_new_image_size['width_of_output_image'] = \
+                (orig_w * args_with_new_image_size['height_of_output_image']) // orig_h
+        
+        elif args_with_new_image_size['height_of_output_image'] is None:
+            args_with_new_image_size['height_of_output_image'] = \
+                (orig_h * args_with_new_image_size['width_of_output_image']) // orig_w
+        
+        else:
+            pass
+        
+        return args_with_new_image_size
+
+
+
 class CLIArgsParser(ArgsParser):
     """
     Класс для парсинга аргументов из командной строки
@@ -172,10 +195,11 @@ class CLIArgsParser(ArgsParser):
             args_dictionary['size_of_replaced_pixel'] = args.size_of_replaced_pixel
             args_dictionary['width_of_output_image'] = args.width_of_output_image
             args_dictionary['height_of_output_image'] = args.height_of_output_image
-            
+
             cur_input_validator = InputValidator(args=args_dictionary)
             cur_input_validator.check_args()
             
+            self.args_dictionary = args_dictionary
             return args_dictionary
 
         except argparse.ArgumentError:
@@ -337,24 +361,29 @@ class MosaicCreator:
 
 if __name__ == '__main__':
     argparser = CLIArgsParser()
-    args = argparser.get_args() 
-    print(args)
-    exit()
+    args_without_new_image_size = argparser.get_args() 
 
-    image_loader = ImageLoader(args['path_to_images'])
+    image_loader = ImageLoader(args_without_new_image_size['path_to_images'])
     images_with_names = image_loader.get_images_with_names()
 
-    width = args['width_of_output_image']
-    height = args['height_of_output_image']
-    image_loader.resize_images(images_with_names[1], width, height)
-
-    
-    mosaic_generator = MosaicCreator(images_with_names[1], width, height)
-
-    path_to_imagebase_for_mosaic = args['path_to_imagebase_for_mosaic']
+    path_to_imagebase_for_mosaic = args_without_new_image_size['path_to_imagebase_for_mosaic']
     image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
 
-    path_to_output_image = mosaic_generator.create_and_show_mosaic_image(image)
+    args = argparser.calculate_output_image_size(image.width, image.height)
+    print(args)
+
+    width_of_replaced_pixel = args['size_of_replaced_pixel']
+    height_of_replaced_pixel = args['size_of_replaced_pixel']
+    image_loader.resize_images(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
+    
+    my_mosaic_creator = MosaicCreator(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
+
+    height_of_output_image = args['height_of_output_image']
+    width_of_output_image = args['width_of_output_image']
+    print(width_of_output_image, height_of_output_image)
+    
+    print('Генерация начата')
+    path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(image)
     print(path_to_output_image)
 
     
