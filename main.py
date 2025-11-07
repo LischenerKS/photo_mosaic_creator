@@ -127,10 +127,28 @@ class InputValidator:
         except:
             self.incorrect_args.append('height_of_output_image')
 
-class ArgsParser(ABC):
+class ArgsParserFabric(ABC):
+    """
+    Класс для создания объектов разных классов парсера аргументов
+    """
+    def get_parser(self, type):
+        if type == 'cli':
+            return CLIArgsParser()
+        elif type == 'another':
+            return AnotherArgsParser()
+        else:
+            raise Exception
+
+
+class AbstractArgsParser(ABC):
     """
     Абстрактный класс парсера аргументов 
     """
+
+    @abstractmethod
+    def __init__(self):
+        pass
+
     @abstractmethod
     def get_args(self) -> dict:
         pass
@@ -156,9 +174,17 @@ class ArgsParser(ABC):
         
         return args_with_new_image_size
 
+class AnotherArgsParser(AbstractArgsParser):
+    """
+    Нереализованный класс парсера аргументов.
+    Нужен чтобы использование паттерна фабрика
+    не выглядело бесполезным.
+    """
 
+    def get_args(self):
+        return dict() #!не реализовано
 
-class CLIArgsParser(ArgsParser):
+class CLIArgsParser(AbstractArgsParser):
     """
     Класс для парсинга аргументов из командной строки
     """
@@ -380,7 +406,9 @@ class MosaicCreator:
 
 
 if __name__ == '__main__':
-    argparser = CLIArgsParser()
+    parser_fabric = ArgsParserFabric()
+    argparser = parser_fabric.get_parser('cli')
+
     args_without_new_image_size = argparser.get_args() 
 
     image_loader = ImageLoader(args_without_new_image_size['path_to_images'])
