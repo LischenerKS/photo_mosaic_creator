@@ -18,6 +18,7 @@ $ git clone https://github.com/LischenerKS/photo_mosaic_creator.git
 $ cd ./photo_mosaic_creator/
 ```
 [Установите зависимости](#Установка-зависимостей)
+
 [Прочитайте пункт "Использование"](#Использование)
 
 ## Установка зависимостей
