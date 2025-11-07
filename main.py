@@ -57,7 +57,8 @@ class InputValidator:
             path_to_images_dir = self.args['path_to_images']
             image_names = os.listdir(path_to_images_dir)
             for image_name in image_names:
-                Image.open(f'{path_to_images_dir}{image_name}').close()
+                path = os.path.join(path_to_images_dir, image_name)
+                Image.open(path).close()
         except:
             self.incorrect_args.append('path_to_images_dir')
         
@@ -139,7 +140,6 @@ class ArgsParserFabric(ABC):
         else:
             raise Exception
 
-
 class AbstractArgsParser(ABC):
     """
     Абстрактный класс парсера аргументов 
@@ -195,10 +195,10 @@ class CLIArgsParser(AbstractArgsParser):
                             help='Путь до изображения, по которому строится мозаика')
         
         self.parser.add_argument('-indir', '--path_to_images', type=str, help='Путь до директории, в которой находятся \
-                            изображения, которые будут заменять пиксели. Должен оканчиваться на /', required=True)
+                            изображения, которые будут заменять пиксели.', required=True)
         
         self.parser.add_argument('-outdir', '--path_to_output_image_dir', type=str, help='Путь до директории, в которой \
-                            сохранится результат работы программы. Должен оканчиваться на /', required=True)
+                            сохранится результат работы программы.', required=True)
         
         self.parser.add_argument('-srp', '--size_of_replaced_pixel', type=int, help='размер изображения, которое будет \
                             заменять пиксель', default=50, required=False)
@@ -271,7 +271,7 @@ class ImageLoader:
         image_names = os.listdir(self._PATH_TO_IMAGES)
 
         for image_name in tqdm(image_names, desc='Открываем изображения', leave=False, colour="cyan"):
-            path_to_image = f'{self._PATH_TO_IMAGES}{image_name}'
+            path_to_image = os.path.join(self._PATH_TO_IMAGES, image_name)
             with Image.open(path_to_image) as img:
                 img.load()
                 images[0].append(image_name)
@@ -312,7 +312,7 @@ class MosaicCreator:
         r = 0
         g = 0
         b = 0
-        count_pixels = image.width * image.width
+        count_pixels = image.width * image.height
         
         for width in range(image.width):
             for height in range(image.height):
@@ -437,5 +437,3 @@ if __name__ == '__main__':
     path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(base_image)
     print(f'Генерация успешно завершена, путь до изображения {path_to_output_image}')
 
-
-    
