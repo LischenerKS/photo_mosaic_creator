@@ -3,6 +3,7 @@ import os
 from abc import ABC, abstractmethod
 import argparse
 from tqdm import tqdm
+from dotenv import load_dotenv
 
 class InputValidator:
 
@@ -156,10 +157,12 @@ class AbstractArgsParser(ABC):
     def calculate_output_image_size(self, orig_w: int, orig_h: int) -> dict:
         args_with_new_image_size = self.args_dictionary.copy()
 
+        DEFAULT_SCALE_MULTIPLIER = int(os.getenv("DEFAULT_SCALE_MULTIPLIER"))
+
         if (args_with_new_image_size['width_of_output_image'] is None) \
         and (args_with_new_image_size['height_of_output_image'] is None):
-            args_with_new_image_size['width_of_output_image'] = orig_w * 10
-            args_with_new_image_size['height_of_output_image'] = orig_h * 10
+            args_with_new_image_size['width_of_output_image'] = orig_w * DEFAULT_SCALE_MULTIPLIER
+            args_with_new_image_size['height_of_output_image'] = orig_h * DEFAULT_SCALE_MULTIPLIER
         
         elif args_with_new_image_size['width_of_output_image'] is None:
             args_with_new_image_size['width_of_output_image'] = \
@@ -200,8 +203,10 @@ class CLIArgsParser(AbstractArgsParser):
         self.parser.add_argument('-outdir', '--path_to_output_image_dir', type=str, help='Путь до директории, в которой \
                             сохранится результат работы программы.', required=True)
         
+        DEFAULT_SIZE_OF_REPLACED_PIXEL = int(os.getenv("DEFAULT_SIZE_OF_REPLACED_PIXEL"))
+
         self.parser.add_argument('-srp', '--size_of_replaced_pixel', type=int, help='размер изображения, которое будет \
-                            заменять пиксель', default=50, required=False)
+                            заменять пиксель', default=DEFAULT_SIZE_OF_REPLACED_PIXEL, required=False)
         
         self.parser.add_argument('-woi', '--width_of_output_image', type=int, help='ширина полученного изображения в \
                                  замененных пикселях', required=False)
@@ -263,7 +268,7 @@ class ImageLoader:
         return orig_image
 
     def resize_images(self, images, width, height) -> None:
-        for i in range(len(images)):
+        for i in tqdm(range(len(images)), desc='Сжимаем изображения для замены', leave=False, colour="yellow"):
             images[i] = images[i].resize( (width, height) )
 
     def get_images_with_names(self) -> tuple[list[str], list[Image]]:
@@ -296,7 +301,7 @@ class MosaicCreator:
     класс для генерации мозаики
     """
     
-    def __init__(self, images, images_width, images_height, path_to_output_image = './output/'):
+    def __init__(self, images, images_width, images_height, path_to_output_image):
         self._images = images 
         self._avg_colors_images = self._get_avg_colors_array()
 
@@ -396,16 +401,18 @@ class MosaicCreator:
                 i += 1    
                     
         output_image_counter = 0
-        output_image_name = f'{self._path_to_output_image}output_image_{output_image_counter}.jpg'
+        output_image_name = os.path.join(self._path_to_output_image, f'output_image_{output_image_counter}.jpg')
         while os.path.exists(output_image_name):
             output_image_counter += 1
-            output_image_name = f'{self._path_to_output_image}output_image_{output_image_counter}.jpg'
+            output_image_name = os.path.join(self._path_to_output_image, f'output_image_{output_image_counter}.jpg')
 
         new_image.save(output_image_name)
         return output_image_name      
 
 class MosaicFacade:
     def create_mosaic(self, args_sourse:str) -> None:
+        load_dotenv()
+
         parser_fabric = ArgsParserFabric()
         argparser = parser_fabric.get_parser(args_sourse)
 
@@ -423,7 +430,12 @@ class MosaicFacade:
         height_of_replaced_pixel = args['size_of_replaced_pixel']
         image_loader.resize_images(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
         
-        my_mosaic_creator = MosaicCreator(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
+        my_mosaic_creator = MosaicCreator(
+            images_with_names[1],
+            width_of_replaced_pixel,
+            height_of_replaced_pixel,
+            args['path_to_output_image_dir']
+        )
 
         mosaic_size = args['width_of_output_image'], args['height_of_output_image'] 
 
