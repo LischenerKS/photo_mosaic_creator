@@ -216,6 +216,27 @@ class ImageLoader:
     def __init__(self, path_to_images):
         self._PATH_TO_IMAGES = path_to_images
 
+    def resize_base_image(self, orig_image, mosaic_size, pixel_size) -> Image:
+        """
+        Приводит изображение, по которому строится мозаика, к такому 
+        размеру, чтобы при заданном pixel_size получился ожидаемый 
+        mosaic_size.
+        """
+        mosaic_width = mosaic_size[0]
+        mosaic_height = mosaic_size[1]
+        
+        pixel_width = pixel_size[0]
+        pixel_height  = pixel_size[1]
+
+        new_orig_image_width = mosaic_width // pixel_width
+        new_orig_image_height = mosaic_height // pixel_height
+
+        print(new_orig_image_width, new_orig_image_height)
+
+        orig_image = orig_image.resize( (new_orig_image_width, new_orig_image_height) )
+
+        return orig_image
+
     def resize_images(self, images, width, height) -> None:
         for i in range(len(images)):
             images[i] = images[i].resize( (width, height) )
@@ -367,10 +388,9 @@ if __name__ == '__main__':
     images_with_names = image_loader.get_images_with_names()
 
     path_to_imagebase_for_mosaic = args_without_new_image_size['path_to_imagebase_for_mosaic']
-    image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
+    base_image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
 
-    args = argparser.calculate_output_image_size(image.width, image.height)
-    print(args)
+    args = argparser.calculate_output_image_size(base_image.width, base_image.height)
 
     width_of_replaced_pixel = args['size_of_replaced_pixel']
     height_of_replaced_pixel = args['size_of_replaced_pixel']
@@ -378,12 +398,16 @@ if __name__ == '__main__':
     
     my_mosaic_creator = MosaicCreator(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
 
-    height_of_output_image = args['height_of_output_image']
-    width_of_output_image = args['width_of_output_image']
-    print(width_of_output_image, height_of_output_image)
-    
-    print('Генерация начата')
-    path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(image)
+    mosaic_size = args['width_of_output_image'], args['height_of_output_image'] 
+
+    base_image = image_loader.resize_base_image(
+        base_image,
+        mosaic_size,
+        ( width_of_replaced_pixel, height_of_replaced_pixel ) 
+    )
+
+
+    path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(base_image)
     print(path_to_output_image)
 
     
