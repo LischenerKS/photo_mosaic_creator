@@ -404,36 +404,41 @@ class MosaicCreator:
         new_image.save(output_image_name)
         return output_image_name      
 
+class MosaicFacade:
+    def create_mosaic(self, args_sourse:str) -> None:
+        parser_fabric = ArgsParserFabric()
+        argparser = parser_fabric.get_parser(args_sourse)
+
+        args_without_new_image_size = argparser.get_args() 
+
+        image_loader = ImageLoader(args_without_new_image_size['path_to_images'])
+        images_with_names = image_loader.get_images_with_names()
+
+        path_to_imagebase_for_mosaic = args_without_new_image_size['path_to_imagebase_for_mosaic']
+        base_image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
+
+        args = argparser.calculate_output_image_size(base_image.width, base_image.height)
+
+        width_of_replaced_pixel = args['size_of_replaced_pixel']
+        height_of_replaced_pixel = args['size_of_replaced_pixel']
+        image_loader.resize_images(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
+        
+        my_mosaic_creator = MosaicCreator(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
+
+        mosaic_size = args['width_of_output_image'], args['height_of_output_image'] 
+
+        base_image = image_loader.resize_base_image(
+            base_image,
+            mosaic_size,
+            ( width_of_replaced_pixel, height_of_replaced_pixel ) 
+        )
+
+
+        path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(base_image)
+        print(f'Генерация успешно завершена, путь до изображения {path_to_output_image}')
+
 
 if __name__ == '__main__':
-    parser_fabric = ArgsParserFabric()
-    argparser = parser_fabric.get_parser('cli')
-
-    args_without_new_image_size = argparser.get_args() 
-
-    image_loader = ImageLoader(args_without_new_image_size['path_to_images'])
-    images_with_names = image_loader.get_images_with_names()
-
-    path_to_imagebase_for_mosaic = args_without_new_image_size['path_to_imagebase_for_mosaic']
-    base_image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
-
-    args = argparser.calculate_output_image_size(base_image.width, base_image.height)
-
-    width_of_replaced_pixel = args['size_of_replaced_pixel']
-    height_of_replaced_pixel = args['size_of_replaced_pixel']
-    image_loader.resize_images(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
-    
-    my_mosaic_creator = MosaicCreator(images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel)
-
-    mosaic_size = args['width_of_output_image'], args['height_of_output_image'] 
-
-    base_image = image_loader.resize_base_image(
-        base_image,
-        mosaic_size,
-        ( width_of_replaced_pixel, height_of_replaced_pixel ) 
-    )
-
-
-    path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(base_image)
-    print(f'Генерация успешно завершена, путь до изображения {path_to_output_image}')
+    my_mosaic_facade = MosaicFacade()
+    my_mosaic_facade.create_mosaic('cli')
 
