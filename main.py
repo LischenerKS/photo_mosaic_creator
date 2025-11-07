@@ -2,6 +2,7 @@ from PIL import Image
 import os
 from abc import ABC, abstractmethod
 import argparse
+from tqdm import tqdm
 
 class InputValidator:
 
@@ -231,8 +232,6 @@ class ImageLoader:
         new_orig_image_width = mosaic_width // pixel_width
         new_orig_image_height = mosaic_height // pixel_height
 
-        print(new_orig_image_width, new_orig_image_height)
-
         orig_image = orig_image.resize( (new_orig_image_width, new_orig_image_height) )
 
         return orig_image
@@ -245,7 +244,7 @@ class ImageLoader:
         images = ([], [])
         image_names = os.listdir(self._PATH_TO_IMAGES)
 
-        for image_name in image_names:
+        for image_name in tqdm(image_names, desc='Открываем изображения', leave=False, colour="cyan"):
             path_to_image = f'{self._PATH_TO_IMAGES}{image_name}'
             with Image.open(path_to_image) as img:
                 img.load()
@@ -346,13 +345,13 @@ class MosaicCreator:
         на ближайшие по среднему цвету изображения из images
         возравращает путь до него
         """
-        print('\nГенерация мозаики начата')
 
         new_image_pixels = []
         new_image_width = old_image.width * self._images_width
         new_image_height = old_image.height * self._images_height
 
-        for h in range(old_image.height):
+        
+        for h in tqdm(range(old_image.height), desc='Готовим изображения для замены пикселей', leave=False, colour="MAGENTA"):
             for w in range(old_image.width):
                 pixel = old_image.getpixel( (w, h) )
                 closest_image_ids = self._find_index_of_closest_by_avg_color_image(pixel)
@@ -362,7 +361,7 @@ class MosaicCreator:
         new_image = Image.new('RGB', (new_image_width, new_image_height))
 
         i = 0
-        for h in range(old_image.height):
+        for h in tqdm(range(old_image.height), desc='Создаем новое изображение', leave=False, colour="green"):
             for w in range(old_image.width):
                 new_w = w * self._images_width
                 new_h = h * self._images_height
@@ -408,6 +407,7 @@ if __name__ == '__main__':
 
 
     path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(base_image)
-    print(path_to_output_image)
+    print(f'Генерация успешно завершена, путь до изображения {path_to_output_image}')
+
 
     
