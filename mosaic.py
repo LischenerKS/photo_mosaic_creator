@@ -2,6 +2,7 @@ import os
 
 from PIL import Image
 from dotenv import load_dotenv
+from dotenv.main import with_warn_for_invalid_lines
 from tqdm import tqdm
 
 from args_parsers import ArgsParserFabric
@@ -190,22 +191,17 @@ class MosaicFacade:
         parser_fabric = ArgsParserFabric()
         argparser = parser_fabric.get_parser(args_sourse)
 
-        args_without_new_image_size = argparser.get_args_dictionary()
+        args = argparser.get_args_dictionary()
 
-        image_loader = ImageLoader(args_without_new_image_size["path_to_images"])
+        image_loader = ImageLoader(args["path_to_images"])
         images_with_names = image_loader.get_images_with_names()
 
-        path_to_imagebase_for_mosaic = args_without_new_image_size[
-            "path_to_imagebase_for_mosaic"
-        ]
+        path_to_imagebase_for_mosaic = args["path_to_imagebase_for_mosaic"]
         base_image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
-
-        args = argparser.calculate_output_image_size(
-            base_image.width, base_image.height
-        )
 
         width_of_replaced_pixel = args["size_of_replaced_pixel"]
         height_of_replaced_pixel = args["size_of_replaced_pixel"]
+
         image_loader.resize_images(
             images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel
         )
@@ -217,9 +213,19 @@ class MosaicFacade:
             args["path_to_output_image_dir"],
         )
 
-        mosaic_size = args["width_of_output_image"], args["height_of_output_image"]
+        DEFAULT_SCALE_MULTIPLIER = int(os.getenv("DEFAULT_SCALE_MULTIPLIER"))
 
-        base_image = base_image.resize(mosaic_size)
+        if args["width_of_output_image"] is None:
+            args["width_of_output_image"] = DEFAULT_SCALE_MULTIPLIER * base_image.width
+
+        if args["height_of_output_image"] is None:
+            args["height_of_output_image"] = (
+                DEFAULT_SCALE_MULTIPLIER * base_image.height
+            )
+
+        base_image = base_image.resize(
+            (args["width_of_output_image"], args["height_of_output_image"])
+        )
 
         path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(
             base_image
