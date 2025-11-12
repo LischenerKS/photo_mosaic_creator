@@ -209,7 +209,7 @@ class MosaicFacade:
         parser_fabric = ArgsParserFabric()
         argparser = parser_fabric.get_parser(args_sourse)
 
-        args_without_new_image_size = argparser.get_args()
+        args_without_new_image_size = argparser.get_args_dictionary()
 
         image_loader = ImageLoader(args_without_new_image_size["path_to_images"])
         images_with_names = image_loader.get_images_with_names()

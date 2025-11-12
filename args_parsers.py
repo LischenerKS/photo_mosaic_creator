@@ -26,14 +26,24 @@ class AbstractArgsParser(ABC):
     """
 
     def __init__(self):
-        pass
+        self._args_dictionary = self._get_args()
 
     @abstractmethod
-    def get_args(self) -> dict:
+    def _get_args(self) -> dict:
+        """
+        Абстрактный метод для парсинга аргументов
+        """
+
         pass
 
+    def get_args_dictionary(self) -> dict:
+        """
+        Метод, возвращающий словарь аргументов
+        """
+        return self._args_dictionary
+
     def calculate_output_image_size(self, orig_w: int, orig_h: int) -> dict:
-        args_with_new_image_size = self.args_dictionary.copy()
+        args_with_new_image_size = self._args_dictionary.copy()
 
         DEFAULT_SCALE_MULTIPLIER = int(os.getenv("DEFAULT_SCALE_MULTIPLIER"))
 
@@ -144,7 +154,14 @@ class CLIArgsParser(AbstractArgsParser):
             "-?", "--show_help", action="help", help="Показать справку"
         )
 
-    def get_args(self) -> dict:
+        self._args_dictionary = self._get_args()
+
+
+
+    def _get_args(self) -> dict:
+        """
+        Метод для парсинга аргументов командной строки в словарь
+        """
         try:
             args = self.parser.parse_args()
 
@@ -175,3 +192,4 @@ class CLIArgsParser(AbstractArgsParser):
             print("Ошибка в аргументах, попробуйте еще раз.\n")
             self.parser.print_help()
             exit()
+
