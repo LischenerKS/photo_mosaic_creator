@@ -3,20 +3,21 @@ import os
 from abc import ABC, abstractmethod
 
 import input_validator
+from errors import ParserTypeNotExists
 
 
-class ArgsParserFabric(ABC):
+class ArgsParserFabric():
     """
     Класс для создания объектов разных классов парсера аргументов
     """
 
-    def get_parser(self, type):
-        if type == "cli":
+    def get_parser(self, parser_type):
+        if parser_type == "cli":
             return CLIArgsParser()
-        elif type == "another":
+        elif parser_type == "another":
             return AnotherArgsParser()
         else:
-            raise Exception
+            raise ParserTypeNotExists(parser_type)
 
 
 class AbstractArgsParser(ABC):
@@ -24,7 +25,6 @@ class AbstractArgsParser(ABC):
     Абстрактный класс парсера аргументов
     """
 
-    @abstractmethod
     def __init__(self):
         pass
 
