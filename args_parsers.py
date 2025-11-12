@@ -6,7 +6,7 @@ import input_validator
 from errors import ParserTypeNotExists
 
 
-class ArgsParserFabric():
+class ArgsParserFabric:
     """
     Класс для создания объектов разных классов парсера аргументов
     """
@@ -156,8 +156,6 @@ class CLIArgsParser(AbstractArgsParser):
 
         self._args_dictionary = self._get_args()
 
-
-
     def _get_args(self) -> dict:
         """
         Метод для парсинга аргументов командной строки в словарь
@@ -192,4 +190,3 @@ class CLIArgsParser(AbstractArgsParser):
             print("Ошибка в аргументах, попробуйте еще раз.\n")
             self.parser.print_help()
             exit()
-

@@ -8,6 +8,7 @@ class InputValidator:
     """
     Класс для проверки переданных программе аргументов
     """
+
     def __init__(
         self,
         path_to_image_base_for_mosaic: str,
