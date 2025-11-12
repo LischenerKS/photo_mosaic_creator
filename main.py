@@ -19,7 +19,7 @@ class InputValidator:
         """
 
         self.check_path_to_imagebase_for_mosaic()
-        self.check_path_to_images_correct()
+        self.check_path_to_images()
         self.check_path_to_output_image_dir()
         self.check_size_of_replaced_pixel()
         self.check_width_of_output_image()
@@ -45,7 +45,7 @@ class InputValidator:
         except:
             self.incorrect_args.append("path_to_imagebase_for_mosaic")
 
-    def check_path_to_images_correct(self) -> None:
+    def check_path_to_images(self) -> None:
         """
         Пытается получить из self.args path_to_images_dir,
         прочитать список имен по полученному пути
