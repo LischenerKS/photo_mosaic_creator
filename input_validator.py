@@ -85,15 +85,14 @@ class InputValidator:
         Пытается получить path_to_output_image_dir путь до директории
         для сохранения полученного изображения,
         и проверить что директория существует.
-        Если директория не существует,
-        то возвращает строку 'path_to_output_image_dir'.
-        Иначе возвращает None
+        Если директория не существует, то создает ее
+        Если создать или открыть директорию не удается, то
+        возвращает строку 'path_to_output_image_dir'
         """
-        # todo добавить проверку на права для директории
-        # todo добавить проверку на то что строка оканчивается на /
         try:
             if not os.path.isdir(self.path_to_output_image_dir):
-                return "path_to_output_image_dir"
+                os.mkdir(self.path_to_output_image_dir)
+                return None
             return None
         except:
             return "path_to_output_image_dir"
