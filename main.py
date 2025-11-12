@@ -32,12 +32,12 @@ class InputValidator:
         и останавливает выполнение всей программы.
         """
 
-        self.check_path_to_imagebase_for_mosaic()
-        self.check_path_to_images_dir()
-        self.check_path_to_output_image_dir()
-        self.check_size_of_replaced_pixel()
-        self.check_width_of_output_image()
-        self.check_height_of_output_image()
+        self._check_path_to_imagebase_for_mosaic()
+        self._check_path_to_images_dir()
+        self._check_path_to_output_image_dir()
+        self._check_size_of_replaced_pixel()
+        self._check_width_of_output_image()
+        self._check_height_of_output_image()
 
         if self.incorrect_args:
             for inc_arg in self.incorrect_args:
@@ -45,7 +45,7 @@ class InputValidator:
             print("Попробуйте еще раз.")
             exit()
 
-    def check_path_to_imagebase_for_mosaic(self) -> None:
+    def _check_path_to_imagebase_for_mosaic(self) -> None:
         """
         Пытается открыть указанный в self.path_to_imagebase_for_mosaic файл как изображение.
         Если файл не удалось открыть, то добавляет в self.incorrect_args
@@ -57,7 +57,7 @@ class InputValidator:
         except:
             self.incorrect_args.append("path_to_imagebase_for_mosaic")
 
-    def check_path_to_images_dir(self) -> None:
+    def _check_path_to_images_dir(self) -> None:
         """
         Пытается,
         прочитать список имен по полученному из path_to_images пути
@@ -74,7 +74,7 @@ class InputValidator:
         except:
             self.incorrect_args.append("path_to_images")
 
-    def check_path_to_output_image_dir(self) -> None:
+    def _check_path_to_output_image_dir(self) -> None:
         """
         Пытается получить path_to_output_image_dir путь до директории
         для сохранения полученного изображения,
@@ -91,7 +91,7 @@ class InputValidator:
         except:
             self.incorrect_args.append("path_to_output_image_dir")
 
-    def check_size_of_replaced_pixel(self) -> None:
+    def _check_size_of_replaced_pixel(self) -> None:
         """
         Пытается получить из size_of_replaced_pixel размер пикселя для замены
         и проверить что это целое положительное число
@@ -105,7 +105,7 @@ class InputValidator:
         except:
             self.incorrect_args.append("size_of_replaced_pixel")
 
-    def check_width_of_output_image(self) -> None:
+    def _check_width_of_output_image(self) -> None:
         """
         Пытается получить из self.width_of_output_image ширину итогового изображения
         и проверить что она является целым положительным числом или None.
@@ -124,7 +124,7 @@ class InputValidator:
         except:
             self.incorrect_args.append("width_of_output_image")
 
-    def check_height_of_output_image(self) -> None:
+    def _check_height_of_output_image(self) -> None:
         """
         Пытается получить из self.height_of_output_image высоту итогового изображения
         и проверить что она является целым положительным числом или None.
