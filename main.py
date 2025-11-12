@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 
 class InputValidator:
-    def __init__(self, args: dict):
+    def __init__(self, path_to_imagebase_for_mosaic: str, path_to_images: str, path_to_output_image_dir):
         self.args = args
         self.incorrect_args = []
 
@@ -18,7 +18,7 @@ class InputValidator:
         и останавливает выполнение всей программы.
         """
 
-        self.check_path_to_imagebase_for_mosaic_correct()
+        self.check_path_to_imagebase_for_mosaic()
         self.check_path_to_images_correct()
         self.check_path_to_output_image_dir()
         self.check_size_of_replaced_pixel()
@@ -31,7 +31,7 @@ class InputValidator:
             print("Попробуйте еще раз.")
             exit()
 
-    def check_path_to_imagebase_for_mosaic_correct(self) -> None:
+    def check_path_to_imagebase_for_mosaic(self) -> None:
         """
         Пытается получить из self.args path_to_imagebase_for_mosaic
         и открыть указанный файл как изображение.
