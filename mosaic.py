@@ -16,25 +16,6 @@ class ImageLoader:
     def __init__(self, path_to_images):
         self._PATH_TO_IMAGES = path_to_images
 
-    def resize_base_image(self, orig_image, mosaic_size, pixel_size) -> Image:
-        """
-        Приводит изображение, по которому строится мозаика, к такому
-        размеру, чтобы при заданном pixel_size получился ожидаемый
-        mosaic_size.
-        """
-        mosaic_width = mosaic_size[0]
-        mosaic_height = mosaic_size[1]
-
-        pixel_width = pixel_size[0]
-        pixel_height = pixel_size[1]
-
-        new_orig_image_width = mosaic_width // pixel_width
-        new_orig_image_height = mosaic_height // pixel_height
-
-        orig_image = orig_image.resize((new_orig_image_width, new_orig_image_height))
-
-        return orig_image
-
     def resize_images(self, images, width, height) -> None:
         for i in tqdm(
             range(len(images)),
@@ -238,9 +219,7 @@ class MosaicFacade:
 
         mosaic_size = args["width_of_output_image"], args["height_of_output_image"]
 
-        base_image = image_loader.resize_base_image(
-            base_image, mosaic_size, (width_of_replaced_pixel, height_of_replaced_pixel)
-        )
+        base_image = base_image.resize(mosaic_size)
 
         path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(
             base_image
