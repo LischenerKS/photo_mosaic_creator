@@ -7,8 +7,22 @@ from dotenv import load_dotenv
 
 
 class InputValidator:
-    def __init__(self, path_to_imagebase_for_mosaic: str, path_to_images: str, path_to_output_image_dir):
-        self.args = args
+    def __init__(
+        self,
+        path_to_image_base_for_mosaic: str,
+        path_to_images: str,
+        path_to_output_image_dir: str,
+        check_size_of_replaced_pixel: str,
+        check_width_of_output_image: str,
+        check_height_of_output_image: str,
+    ):
+        self.path_to_imagebase_for_mosaic = path_to_image_base_for_mosaic
+        self.path_to_images = path_to_images
+        self.path_to_output_image_dir = path_to_output_image_dir
+        self.check_size_of_replaced_pixel = check_size_of_replaced_pixel
+        self.check_width_of_output_image = check_width_of_output_image
+        self.check_height_of_output_image = check_height_of_output_image
+
         self.incorrect_args = []
 
     def check_args(self) -> None:
@@ -33,15 +47,13 @@ class InputValidator:
 
     def check_path_to_imagebase_for_mosaic(self) -> None:
         """
-        Пытается получить из self.args path_to_imagebase_for_mosaic
-        и открыть указанный файл как изображение.
+        Пытается открыть указанный в self.path_to_imagebase_for_mosaic файл как изображение.
         Если файл не удалось открыть, то добавляет в self.incorrect_args
         строку 'path_to_imagebase_for_mosaic'.
         Если файл удалось открыть, то ничего не делает.
         """
         try:
-            path_to_imagebase_for_mosaic = self.args["path_to_imagebase_for_mosaic"]
-            Image.open(path_to_imagebase_for_mosaic).close()
+            Image.open(self.path_to_imagebase_for_mosaic).close()
         except:
             self.incorrect_args.append("path_to_imagebase_for_mosaic")
 
