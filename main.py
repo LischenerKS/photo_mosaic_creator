@@ -1,3 +1,5 @@
+from typing import Optional
+
 from PIL import Image
 import os
 from abc import ABC, abstractmethod
@@ -29,114 +31,123 @@ class InputValidator:
         Если аргумент(ы) некорректны, то выводит пользователю какие из аргументов некорректны
         и останавливает выполнение всей программы.
         """
-        incorrect_args = [self._check_path_to_imagebase_for_mosaic(), self._check_path_to_images_dir(),
-                          self._check_path_to_output_image_dir(), self._check_size_of_replaced_pixel(),
-                          self._check_width_of_output_image(), self._check_height_of_output_image()]
+        incorrect_args = [
+            self._check_path_to_imagebase_for_mosaic(),
+            self._check_path_to_images_dir(),
+            self._check_path_to_output_image_dir(),
+            self._check_size_of_replaced_pixel(),
+            self._check_width_of_output_image(),
+            self._check_height_of_output_image(),
+        ]
 
-        if incorrect_args:
-            for inc_arg in incorrect_args:
-                if inc_arg is not None:
-                    print(f"Аргумент {inc_arg} введен неверно!")
+        is_given_incorrect_args = False
+
+        for inc_arg in incorrect_args:
+            if inc_arg is not None:
+                is_given_incorrect_args = True
+                print(f"Аргумент {inc_arg} введен неверно!")
+
+        if is_given_incorrect_args:
             print("Попробуйте еще раз.")
             exit()
 
-    def _check_path_to_imagebase_for_mosaic(self) -> None:
+    def _check_path_to_imagebase_for_mosaic(self) -> Optional[str]:
         """
         Пытается открыть указанный в self.path_to_imagebase_for_mosaic файл как изображение.
-        Если файл не удалось открыть, то добавляет в self.incorrect_args
+        Если файл не удалось открыть, то возвращает
         строку 'path_to_imagebase_for_mosaic'.
-        Если файл удалось открыть, то ничего не делает.
+        Если файл удалось открыть, то возвращает None
         """
         try:
             Image.open(self.path_to_imagebase_for_mosaic).close()
+            return None
         except:
-            self.incorrect_args.append("path_to_imagebase_for_mosaic")
+            return "path_to_imagebase_for_mosaic"
 
-    def _check_path_to_images_dir(self) -> None:
+    def _check_path_to_images_dir(self) -> Optional[str]:
         """
         Пытается,
         прочитать список имен по полученному из path_to_images пути
         и открыть каждое из списка как изображение.
-        Если хотя бы один файл не удалось открыть, то добавляет
-        в self.incorrect_args строку 'path_to_images'.
-        Если каждый файл удалось открыть, то ничего не делает.
+        Если хотя бы один файл не удалось открыть, то возвращает строку 'path_to_images'.
+        Если каждый файл удалось открыть, то возвращает None
         """
         try:
             image_names = os.listdir(self.path_to_images)
             for image_name in image_names:
                 path = os.path.join(self.path_to_images, image_name)
                 Image.open(path).close()
+            return None
         except:
-            self.incorrect_args.append("path_to_images")
+            return "path_to_images"
 
-    def _check_path_to_output_image_dir(self) -> None:
+    def _check_path_to_output_image_dir(self) -> Optional[str]:
         """
         Пытается получить path_to_output_image_dir путь до директории
         для сохранения полученного изображения,
         и проверить что директория существует.
-        Если получить аргумент не удалось или директории не существует,
-        то добавляет в self.incorrect_args строку 'path_to_output_image_dir'.
-        Иначе ничего не делает.
+        Если директория не существует,
+        то возвращает строку 'path_to_output_image_dir'.
+        Иначе возвращает None
         """
         # todo добавить проверку на права для директории
         # todo добавить проверку на то что строка оканчивается на /
         try:
             if not os.path.isdir(self.path_to_output_image_dir):
-                self.incorrect_args.append("path_to_output_image_dir")
+                return "path_to_output_image_dir"
+            return None
         except:
-            self.incorrect_args.append("path_to_output_image_dir")
+            return "path_to_output_image_dir"
 
-    def _check_size_of_replaced_pixel(self) -> None:
+    def _check_size_of_replaced_pixel(self) -> Optional[str]:
         """
         Пытается получить из size_of_replaced_pixel размер пикселя для замены
         и проверить что это целое положительное число
-        Если проверка не выполняется или оказывается ложной, то добавляет
-        в self.incorrect_args строку 'size_of_replaced_pixel'.
-        Иначе ничего не делает.
+        Если проверка не выполняется или оказывается ложной, то возвращает строку 'size_of_replaced_pixel'.
+        Иначе возвращает None
         """
         try:
             if not (int(self.size_of_replaced_pixel) > 0):
-                self.incorrect_args.append("size_of_replaced_pixel")
+                return "size_of_replaced_pixel"
+            return None
         except:
-            self.incorrect_args.append("size_of_replaced_pixel")
+            return "size_of_replaced_pixel"
 
-    def _check_width_of_output_image(self) -> None:
+    def _check_width_of_output_image(self) -> Optional[str]:
         """
         Пытается получить из self.width_of_output_image ширину итогового изображения
         и проверить что она является целым положительным числом или None.
-        Если проверка не выполняется или оказывается ложной, то добавляет
-        в self.incorrect_args строку 'width_of_output_image'.
-        Иначе ничего не делает.
+        Если проверка не выполняется или оказывается ложной, то возвращает строку 'width_of_output_image'.
+        Иначе возвращает None
         """
         try:
             if (
                 self.width_of_output_image is None
                 or int(self.width_of_output_image) > 0
             ):
-                pass  # correct
+                return None
             else:
-                self.incorrect_args.append("width_of_output_image")
+                return "width_of_output_image"
         except:
-            self.incorrect_args.append("width_of_output_image")
+            return "width_of_output_image"
 
-    def _check_height_of_output_image(self) -> None:
+    def _check_height_of_output_image(self) -> Optional[str]:
         """
         Пытается получить из self.height_of_output_image высоту итогового изображения
         и проверить что она является целым положительным числом или None.
-        Если проверка не выполняется или оказывается ложной, то добавляет
-        в self.incorrect_args строку 'height_of_output_image'.
-        Иначе ничего не делает.
+        Если проверка не выполняется или оказывается ложной, то возвращает строку 'height_of_output_image'.
+        Иначе возвращает None
         """
         try:
             if (
                 self.height_of_output_image is None
                 or int(self.height_of_output_image) > 0
             ):
-                pass  # correct
+                return None
             else:
-                self.incorrect_args.append("height_of_output_image")
+                return "height_of_output_image"
         except:
-            self.incorrect_args.append("height_of_output_image")
+            return "height_of_output_image"
 
 
 class ArgsParserFabric(ABC):
