@@ -33,7 +33,7 @@ class InputValidator:
         """
 
         self.check_path_to_imagebase_for_mosaic()
-        self.check_path_to_images()
+        self.check_path_to_images_dir()
         self.check_path_to_output_image_dir()
         self.check_size_of_replaced_pixel()
         self.check_width_of_output_image()
@@ -57,23 +57,22 @@ class InputValidator:
         except:
             self.incorrect_args.append("path_to_imagebase_for_mosaic")
 
-    def check_path_to_images(self) -> None:
+    def check_path_to_images_dir(self) -> None:
         """
-        Пытается получить из self.args path_to_images_dir,
+        Пытается получить из self.args path_to_images,
         прочитать список имен по полученному пути
         и открыть каждое из списка как изображение.
         Если хотя бы один файл не удалось открыть, то добавляет
-        в self.incorrect_args строку 'path_to_images_dir'.
+        в self.incorrect_args строку 'path_to_images'.
         Если каждый файл удалось открыть, то ничего не делает.
         """
         try:
-            path_to_images_dir = self.args["path_to_images"]
-            image_names = os.listdir(path_to_images_dir)
+            image_names = os.listdir(self.path_to_images)
             for image_name in image_names:
-                path = os.path.join(path_to_images_dir, image_name)
+                path = os.path.join(self.path_to_images, image_name)
                 Image.open(path).close()
         except:
-            self.incorrect_args.append("path_to_images_dir")
+            self.incorrect_args.append("path_to_images")
 
     def check_path_to_output_image_dir(self) -> None:
         """
