@@ -12,16 +12,16 @@ class InputValidator:
         path_to_image_base_for_mosaic: str,
         path_to_images: str,
         path_to_output_image_dir: str,
-        check_size_of_replaced_pixel: str,
-        check_width_of_output_image: str,
-        check_height_of_output_image: str,
+        size_of_replaced_pixel: str,
+        width_of_output_image: str,
+        height_of_output_image: str,
     ):
         self.path_to_imagebase_for_mosaic = path_to_image_base_for_mosaic
         self.path_to_images = path_to_images
         self.path_to_output_image_dir = path_to_output_image_dir
-        self.check_size_of_replaced_pixel = check_size_of_replaced_pixel
-        self.check_width_of_output_image = check_width_of_output_image
-        self.check_height_of_output_image = check_height_of_output_image
+        self.size_of_replaced_pixel = size_of_replaced_pixel
+        self.width_of_output_image = width_of_output_image
+        self.height_of_output_image = height_of_output_image
 
         self.incorrect_args = []
 
@@ -39,7 +39,7 @@ class InputValidator:
         self.check_width_of_output_image()
         self.check_height_of_output_image()
 
-        if self.incorrect_args != []:
+        if self.incorrect_args:
             for inc_arg in self.incorrect_args:
                 print(f"Аргумент {inc_arg} введен неверно!")
             print("Попробуйте еще раз.")
@@ -59,8 +59,8 @@ class InputValidator:
 
     def check_path_to_images_dir(self) -> None:
         """
-        Пытается получить из self.args path_to_images,
-        прочитать список имен по полученному пути
+        Пытается,
+        прочитать список имен по полученному из path_to_images пути
         и открыть каждое из списка как изображение.
         Если хотя бы один файл не удалось открыть, то добавляет
         в self.incorrect_args строку 'path_to_images'.
@@ -76,7 +76,8 @@ class InputValidator:
 
     def check_path_to_output_image_dir(self) -> None:
         """
-        Пытается получить из self.args path_to_output_image_dir,
+        Пытается получить path_to_output_image_dir путь до директории
+        для сохранения полученного изображения,
         и проверить что директория существует.
         Если получить аргумент не удалось или директории не существует,
         то добавляет в self.incorrect_args строку 'path_to_output_image_dir'.
@@ -85,38 +86,38 @@ class InputValidator:
         # todo добавить проверку на права для директории
         # todo добавить проверку на то что строка оканчивается на /
         try:
-            path_to_output_image_dir = self.args["path_to_output_image_dir"]
-            if not os.path.isdir(path_to_output_image_dir):
+            if not os.path.isdir(self.path_to_output_image_dir):
                 self.incorrect_args.append("path_to_output_image_dir")
         except:
             self.incorrect_args.append("path_to_output_image_dir")
 
     def check_size_of_replaced_pixel(self) -> None:
         """
-        Пытается получить из self.args size_of_replaced_pixel
+        Пытается получить из size_of_replaced_pixel размер пикселя для замены
         и проверить что это целое положительное число
         Если проверка не выполняется или оказывается ложной, то добавляет
         в self.incorrect_args строку 'size_of_replaced_pixel'.
         Иначе ничего не делает.
         """
         try:
-            size_of_replaced_pixel = self.args["size_of_replaced_pixel"]
-            if not (int(size_of_replaced_pixel) > 0):
+            if not (int(self.size_of_replaced_pixel) > 0):
                 self.incorrect_args.append("size_of_replaced_pixel")
         except:
             self.incorrect_args.append("size_of_replaced_pixel")
 
     def check_width_of_output_image(self) -> None:
         """
-        Пытается получить из self.args
-        width_of_output_image и проверить что он является целым положительным числом или None
+        Пытается получить из self.width_of_output_image ширину итогового изображения
+        и проверить что она является целым положительным числом или None.
         Если проверка не выполняется или оказывается ложной, то добавляет
         в self.incorrect_args строку 'width_of_output_image'.
         Иначе ничего не делает.
         """
         try:
-            width_of_output_image = self.args["width_of_output_image"]
-            if width_of_output_image is None or int(width_of_output_image) > 0:
+            if (
+                self.width_of_output_image is None
+                or int(self.width_of_output_image) > 0
+            ):
                 pass  # correct
             else:
                 self.incorrect_args.append("width_of_output_image")
@@ -125,15 +126,17 @@ class InputValidator:
 
     def check_height_of_output_image(self) -> None:
         """
-        Пытается получить из self.args
-        height_of_output_image и проверить что он является целым положительным числом или None
+        Пытается получить из self.height_of_output_image высоту итогового изображения
+        и проверить что она является целым положительным числом или None.
         Если проверка не выполняется или оказывается ложной, то добавляет
         в self.incorrect_args строку 'height_of_output_image'.
         Иначе ничего не делает.
         """
         try:
-            height_of_output_image = self.args["height_of_output_image"]
-            if height_of_output_image is None or int(height_of_output_image) > 0:
+            if (
+                self.height_of_output_image is None
+                or int(self.height_of_output_image) > 0
+            ):
                 pass  # correct
             else:
                 self.incorrect_args.append("height_of_output_image")
