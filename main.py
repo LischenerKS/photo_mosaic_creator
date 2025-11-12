@@ -297,7 +297,14 @@ class CLIArgsParser(AbstractArgsParser):
             args_dictionary["width_of_output_image"] = args.width_of_output_image
             args_dictionary["height_of_output_image"] = args.height_of_output_image
 
-            cur_input_validator = InputValidator(args=args_dictionary)
+            cur_input_validator = InputValidator(
+                path_to_image_base_for_mosaic=args.path_to_imagebase_for_mosaic,
+                path_to_images=args.path_to_images,
+                path_to_output_image_dir=args.path_to_output_image_dir,
+                size_of_replaced_pixel=args.size_of_replaced_pixel,
+                width_of_output_image=args.width_of_output_image,
+                height_of_output_image=args.height_of_output_image,
+            )
             cur_input_validator.check_args()
 
             self.args_dictionary = args_dictionary
