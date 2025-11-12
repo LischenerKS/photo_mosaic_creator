@@ -23,25 +23,20 @@ class InputValidator:
         self.width_of_output_image = width_of_output_image
         self.height_of_output_image = height_of_output_image
 
-        self.incorrect_args = []
-
     def check_args(self) -> None:
         """
         Вызывает методы для проверки self.args
         Если аргумент(ы) некорректны, то выводит пользователю какие из аргументов некорректны
         и останавливает выполнение всей программы.
         """
+        incorrect_args = [self._check_path_to_imagebase_for_mosaic(), self._check_path_to_images_dir(),
+                          self._check_path_to_output_image_dir(), self._check_size_of_replaced_pixel(),
+                          self._check_width_of_output_image(), self._check_height_of_output_image()]
 
-        self._check_path_to_imagebase_for_mosaic()
-        self._check_path_to_images_dir()
-        self._check_path_to_output_image_dir()
-        self._check_size_of_replaced_pixel()
-        self._check_width_of_output_image()
-        self._check_height_of_output_image()
-
-        if self.incorrect_args:
-            for inc_arg in self.incorrect_args:
-                print(f"Аргумент {inc_arg} введен неверно!")
+        if incorrect_args:
+            for inc_arg in incorrect_args:
+                if inc_arg is not None:
+                    print(f"Аргумент {inc_arg} введен неверно!")
             print("Попробуйте еще раз.")
             exit()
 
