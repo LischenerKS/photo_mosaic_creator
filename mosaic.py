@@ -10,51 +10,8 @@ from args_parsers import ArgsParserFabric
 
 from environments import MODEL_KEY
 from errors import ClosestColorNotFoundError
-
-
-class ImageLoader:
-    """
-    класс содержит утилиты для загрузки изображений из указанной папки
-    """
-
-    def __init__(self, path_to_images):
-        self._PATH_TO_IMAGES = path_to_images
-
-    def resize_images(self, images, width, height) -> None:
-        for i in tqdm(
-            range(len(images)),
-            desc="Сжимаем изображения для замены",
-            leave=False,
-            colour="yellow",
-        ):
-            images[i] = images[i].resize((width, height))
-
-    def get_images_with_names(self) -> tuple[list[str], list[Image]]:
-        images = ([], [])
-        image_names = os.listdir(self._PATH_TO_IMAGES)
-
-        for image_name in tqdm(
-            image_names, desc="Открываем изображения", leave=False, colour="cyan"
-        ):
-            path_to_image = os.path.join(self._PATH_TO_IMAGES, image_name)
-            with Image.open(path_to_image) as img:
-                img.load()
-                images[0].append(image_name)
-                images[1].append(img)
-
-        return images
-
-    def get_image_by_path(self, path) -> Image:
-        """
-        Возвращает Image по переданному пути
-        Путь должен быть корректным
-        """
-
-        with Image.open(path) as img:
-            img.load()
-            image = img
-
-        return image
+from image_loader import ImageLoader
+from image_saver import ImageSaverFabric
 
 
 class MosaicCreator:
@@ -62,11 +19,9 @@ class MosaicCreator:
     класс для генерации мозаики
     """
 
-    def __init__(self, images, images_width, images_height, path_to_output_image):
+    def __init__(self, images, images_width, images_height):
         self._images = images
         self._avg_colors_images = self._get_avg_colors_array(self._images)
-
-        self._path_to_output_image = path_to_output_image
 
         self._images_width = images_width
         self._images_height = images_height
@@ -133,14 +88,19 @@ class MosaicCreator:
 
         return result_id
 
-    def create_and_show_mosaic_image(self, old_image) -> str:
+    def create_and_show_mosaic_image(self, old_image) -> Image:
         """
         создает изображение new_image где пиксели в old_image заменены
         на ближайшие по среднему цвету изображения из images
-        возравращает путь до него
+        и возвращает его
         """
 
         new_image_pixels = []
+        """
+        для i-го пикселя старого изображения хранит id
+        ближайшего по среднему цвету изображения в _images
+        """
+
         new_image_width = old_image.width * self._images_width
         new_image_height = old_image.height * self._images_height
 
@@ -159,7 +119,7 @@ class MosaicCreator:
 
         new_image = Image.new("RGB", (new_image_width, new_image_height))
 
-        i = 0
+        image_id = 0
         for h in tqdm(
             range(old_image.height),
             desc="Создаем новое изображение",
@@ -169,28 +129,15 @@ class MosaicCreator:
             for w in range(old_image.width):
                 new_w = w * self._images_width
                 new_h = h * self._images_height
-                image_to_replace_pixel = self._images[new_image_pixels[i]]
+                image_to_replace_pixel = self._images[new_image_pixels[image_id]]
                 new_image.paste(image_to_replace_pixel, (new_w, new_h))
-                i += 1
+                image_id += 1
 
-        output_image_counter = 0
-        output_image_name = os.path.join(
-            self._path_to_output_image, f"output_image_{output_image_counter}.jpg"
-        )
-        while os.path.exists(output_image_name):
-            output_image_counter += 1
-            output_image_name = os.path.join(
-                self._path_to_output_image, f"output_image_{output_image_counter}.jpg"
-            )
-
-        new_image.save(output_image_name)
-        return output_image_name
+        return new_image
 
 
 class MosaicFacade:
     def create_mosaic(self, args_sourse: str) -> None:
-        load_dotenv()
-
         parser_fabric = ArgsParserFabric()
         argparser = parser_fabric.get_parser(args_sourse)
 
@@ -213,7 +160,6 @@ class MosaicFacade:
             images_with_names[1],
             width_of_replaced_pixel,
             height_of_replaced_pixel,
-            args["path_to_output_image_dir"],
         )
 
         if args["width_of_output_image"] is None:
@@ -230,9 +176,12 @@ class MosaicFacade:
             (args["width_of_output_image"], args["height_of_output_image"])
         )
 
-        path_to_output_image = my_mosaic_creator.create_and_show_mosaic_image(
-            base_image
+        output_image = my_mosaic_creator.create_and_show_mosaic_image(base_image)
+
+        my_image_saver_fabric = ImageSaverFabric()
+        my_image_saver = my_image_saver_fabric.get_input_saver(
+            input_save_type="dir", path_to_output_image=args["path_to_output_image_dir"]
         )
         print(
-            f"Генерация успешно завершена, путь до изображения {path_to_output_image}"
+            f"Генерация успешно завершена, путь до изображения {my_image_saver.save(output_image)}"
         )
