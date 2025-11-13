@@ -141,31 +141,31 @@ class MosaicFacade:
         parser_fabric = ArgsParserFabric()
         argparser = parser_fabric.get_parser(args_sourse)
 
-        args = argparser.get_args_dictionary()
+        program_args = argparser.get_args_dictionary()
 
-        image_loader = ImageLoader(args["path_to_images"])
+        image_loader = ImageLoader(program_args["path_to_images"])
 
-        path_to_imagebase_for_mosaic = args["path_to_imagebase_for_mosaic"]
+        path_to_imagebase_for_mosaic = program_args["path_to_imagebase_for_mosaic"]
         base_image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
 
-        if args["width_of_output_image"] is None:
-            args["width_of_output_image"] = (
+        if program_args["width_of_output_image"] is None:
+            program_args["width_of_output_image"] = (
                 MODEL_KEY["DEFAULT_SCALE_MULTIPLIER"] * base_image.width
             )
 
-        if args["height_of_output_image"] is None:
-            args["height_of_output_image"] = (
+        if program_args["height_of_output_image"] is None:
+            program_args["height_of_output_image"] = (
                 MODEL_KEY["DEFAULT_SCALE_MULTIPLIER"] * base_image.height
             )
 
         base_image = base_image.resize(
-            (args["width_of_output_image"], args["height_of_output_image"])
+            (program_args["width_of_output_image"], program_args["height_of_output_image"])
         )
 
         images_with_names = image_loader.get_images_with_names()
 
-        width_of_replaced_pixel = args["size_of_replaced_pixel"]
-        height_of_replaced_pixel = args["size_of_replaced_pixel"]
+        width_of_replaced_pixel = program_args["size_of_replaced_pixel"]
+        height_of_replaced_pixel = program_args["size_of_replaced_pixel"]
 
         image_loader.resize_images(
             images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel
@@ -181,7 +181,7 @@ class MosaicFacade:
 
         my_image_saver_fabric = ImageSaverFabric()
         my_image_saver = my_image_saver_fabric.get_input_saver(
-            input_save_type="dir", path_to_output_image=args["path_to_output_image_dir"]
+            input_save_type="dir", path_to_output_image=program_args["path_to_output_image_dir"]
         )
         print(
             f"Генерация успешно завершена, путь до изображения {my_image_saver.save(output_image)}"
