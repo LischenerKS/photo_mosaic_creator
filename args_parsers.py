@@ -3,6 +3,7 @@ import os
 from abc import ABC, abstractmethod
 
 import input_validator
+from environments import MODEL_KEY
 from errors import ParserTypeNotExists
 
 
@@ -45,16 +46,14 @@ class AbstractArgsParser(ABC):
     def calculate_output_image_size(self, orig_w: int, orig_h: int) -> dict:
         args_with_new_image_size = self._args_dictionary.copy()
 
-        DEFAULT_SCALE_MULTIPLIER = int(os.getenv("DEFAULT_SCALE_MULTIPLIER"))
-
         if (args_with_new_image_size["width_of_output_image"] is None) and (
             args_with_new_image_size["height_of_output_image"] is None
         ):
             args_with_new_image_size["width_of_output_image"] = (
-                orig_w * DEFAULT_SCALE_MULTIPLIER
+                orig_w * MODEL_KEY["DEFAULT_SCALE_MULTIPLIER"]
             )
             args_with_new_image_size["height_of_output_image"] = (
-                orig_h * DEFAULT_SCALE_MULTIPLIER
+                orig_h * MODEL_KEY["DEFAULT_SCALE_MULTIPLIER"]
             )
 
         elif args_with_new_image_size["width_of_output_image"] is None:
@@ -118,17 +117,13 @@ class CLIArgsParser(AbstractArgsParser):
             required=True,
         )
 
-        DEFAULT_SIZE_OF_REPLACED_PIXEL = int(
-            os.getenv("DEFAULT_SIZE_OF_REPLACED_PIXEL")
-        )
-
         self.parser.add_argument(
             "-srp",
             "--size_of_replaced_pixel",
             type=int,
             help="размер изображения, которое будет \
                             заменять пиксель",
-            default=DEFAULT_SIZE_OF_REPLACED_PIXEL,
+            default=MODEL_KEY["DEFAULT_SIZE_OF_REPLACED_PIXEL"],
             required=False,
         )
 

@@ -8,6 +8,9 @@ from tqdm import tqdm
 from args_parsers import ArgsParserFabric
 
 
+from environments import MODEL_KEY
+
+
 class ImageLoader:
     """
     класс содержит утилиты для загрузки изображений из указанной папки
@@ -213,14 +216,14 @@ class MosaicFacade:
             args["path_to_output_image_dir"],
         )
 
-        DEFAULT_SCALE_MULTIPLIER = int(os.getenv("DEFAULT_SCALE_MULTIPLIER"))
-
         if args["width_of_output_image"] is None:
-            args["width_of_output_image"] = DEFAULT_SCALE_MULTIPLIER * base_image.width
+            args["width_of_output_image"] = (
+                MODEL_KEY["DEFAULT_SCALE_MULTIPLIER"] * base_image.width
+            )
 
         if args["height_of_output_image"] is None:
             args["height_of_output_image"] = (
-                DEFAULT_SCALE_MULTIPLIER * base_image.height
+                MODEL_KEY["DEFAULT_SCALE_MULTIPLIER"] * base_image.height
             )
 
         base_image = base_image.resize(
