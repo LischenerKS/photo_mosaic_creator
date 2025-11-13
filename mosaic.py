@@ -1,8 +1,4 @@
-import os
-
 from PIL import Image
-from dotenv import load_dotenv
-from dotenv.main import with_warn_for_invalid_lines
 from tqdm import tqdm
 
 from args_parsers import ArgsParserFabric
@@ -90,7 +86,7 @@ class MosaicCreator:
 
     def create_and_show_mosaic_image(self, old_image) -> Image:
         """
-        создает изображение new_image где пиксели в old_image заменены
+        создает изображение new_image, где пиксели в old_image заменены
         на ближайшие по среднему цвету изображения из images
         и возвращает его
         """
@@ -137,9 +133,9 @@ class MosaicCreator:
 
 
 class MosaicFacade:
-    def create_mosaic(self, args_sourse: str) -> None:
+    def create_mosaic(self, args_source: str) -> None:
         parser_fabric = ArgsParserFabric()
-        argparser = parser_fabric.get_parser(args_sourse)
+        argparser = parser_fabric.get_parser(args_source)
 
         program_args = argparser.get_args_dictionary()
 
@@ -159,7 +155,10 @@ class MosaicFacade:
             )
 
         base_image = base_image.resize(
-            (program_args["width_of_output_image"], program_args["height_of_output_image"])
+            (
+                program_args["width_of_output_image"],
+                program_args["height_of_output_image"],
+            )
         )
 
         images_with_names = image_loader.get_images_with_names()
@@ -181,7 +180,8 @@ class MosaicFacade:
 
         my_image_saver_fabric = ImageSaverFabric()
         my_image_saver = my_image_saver_fabric.get_input_saver(
-            input_save_type="dir", path_to_output_image=program_args["path_to_output_image_dir"]
+            input_save_type="dir",
+            path_to_output_image=program_args["path_to_output_image_dir"],
         )
         print(
             f"Генерация успешно завершена, путь до изображения {my_image_saver.save(output_image)}"
