@@ -144,23 +144,9 @@ class MosaicFacade:
         args = argparser.get_args_dictionary()
 
         image_loader = ImageLoader(args["path_to_images"])
-        images_with_names = image_loader.get_images_with_names()
 
         path_to_imagebase_for_mosaic = args["path_to_imagebase_for_mosaic"]
         base_image = image_loader.get_image_by_path(path_to_imagebase_for_mosaic)
-
-        width_of_replaced_pixel = args["size_of_replaced_pixel"]
-        height_of_replaced_pixel = args["size_of_replaced_pixel"]
-
-        image_loader.resize_images(
-            images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel
-        )
-
-        my_mosaic_creator = MosaicCreator(
-            images_with_names[1],
-            width_of_replaced_pixel,
-            height_of_replaced_pixel,
-        )
 
         if args["width_of_output_image"] is None:
             args["width_of_output_image"] = (
@@ -174,6 +160,21 @@ class MosaicFacade:
 
         base_image = base_image.resize(
             (args["width_of_output_image"], args["height_of_output_image"])
+        )
+
+        images_with_names = image_loader.get_images_with_names()
+
+        width_of_replaced_pixel = args["size_of_replaced_pixel"]
+        height_of_replaced_pixel = args["size_of_replaced_pixel"]
+
+        image_loader.resize_images(
+            images_with_names[1], width_of_replaced_pixel, height_of_replaced_pixel
+        )
+
+        my_mosaic_creator = MosaicCreator(
+            images_with_names[1],
+            width_of_replaced_pixel,
+            height_of_replaced_pixel,
         )
 
         output_image = my_mosaic_creator.create_and_show_mosaic_image(base_image)
