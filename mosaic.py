@@ -14,7 +14,6 @@ from environments import MODEL_KEY
 class ImageLoader:
     """
     класс содержит утилиты для загрузки изображений из указанной папки
-    путь переданный в конструктор должен быть корректным
     """
 
     def __init__(self, path_to_images):
