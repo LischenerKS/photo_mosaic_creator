@@ -63,7 +63,7 @@ class MosaicCreator:
 
     def __init__(self, images, images_width, images_height, path_to_output_image):
         self._images = images
-        self._avg_colors_images = self._get_avg_colors_array()
+        self._avg_colors_images = self._get_avg_colors_array(self._images)
 
         self._path_to_output_image = path_to_output_image
 
@@ -92,13 +92,13 @@ class MosaicCreator:
 
         return r, g, b
 
-    def _get_avg_colors_array(self) -> list[tuple[int, int, int]]:
+    def _get_avg_colors_array(self, images) -> list[tuple[int, int, int]]:
         """
         метод возвращающий для self.images массив средних цветов
         """
         avg_colors = []
 
-        for image in self._images:
+        for image in images:
             avg_colors.append(self._get_avg_color_image(image))
 
         return avg_colors
