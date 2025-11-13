@@ -9,6 +9,7 @@ from args_parsers import ArgsParserFabric
 
 
 from environments import MODEL_KEY
+from errors import ClosestColorNotFoundError
 
 
 class ImageLoader:
@@ -109,7 +110,9 @@ class MosaicCreator:
         delta_b = abs(pixel_1[2] - pixel_2[2])
         return delta_r + delta_b + delta_g
 
-    def _find_index_of_closest_by_avg_color_image(self, pixel, avg_colors_images) -> int:
+    def _find_index_of_closest_by_avg_color_image(
+        self, pixel, avg_colors_images
+    ) -> int:
         """
         находит в avg_colors_images ближайшее по среднему цвету изображение
         к переданному pixel и возвращает его index
@@ -119,16 +122,14 @@ class MosaicCreator:
         result_id = -1
 
         for i in range(len(avg_colors_images)):
-            distance = self._get_distance_between_pixels(
-                pixel, avg_colors_images[i]
-            )
+            distance = self._get_distance_between_pixels(pixel, avg_colors_images[i])
 
             if distance < min_delta:
                 min_delta = distance
                 result_id = i
 
         if result_id == -1:
-            raise Exception
+            raise ClosestColorNotFoundError(pixel)
 
         return result_id
 
@@ -152,8 +153,7 @@ class MosaicCreator:
             for w in range(old_image.width):
                 pixel = old_image.getpixel((w, h))
                 closest_image_ids = self._find_index_of_closest_by_avg_color_image(
-                    pixel,
-                    self._avg_colors_images
+                    pixel, self._avg_colors_images
                 )
                 new_image_pixels.append(closest_image_ids)
 

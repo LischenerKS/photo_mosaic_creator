@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import input_validator
 from environments import MODEL_KEY
-from errors import ParserTypeNotExists
+from errors import ParserTypeNotExistsError
 
 
 class ArgsParserFabric:
@@ -18,7 +18,7 @@ class ArgsParserFabric:
         elif parser_type == "another":
             return AnotherArgsParser()
         else:
-            raise ParserTypeNotExists(parser_type)
+            raise ParserTypeNotExistsError(parser_type)
 
 
 class AbstractArgsParser(ABC):
