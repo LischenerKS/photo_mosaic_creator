@@ -109,18 +109,18 @@ class MosaicCreator:
         delta_b = abs(pixel_1[2] - pixel_2[2])
         return delta_r + delta_b + delta_g
 
-    def _find_index_of_closest_by_avg_color_image(self, pixel) -> int:
+    def _find_index_of_closest_by_avg_color_image(self, pixel, avg_colors_images) -> int:
         """
-        находит в self.avg_colors_images ближайшее по среднему цвету изображение
+        находит в avg_colors_images ближайшее по среднему цвету изображение
         к переданному pixel и возвращает его index
         """
 
         min_delta = 10**10
         result_id = -1
 
-        for i in range(len(self._avg_colors_images)):
+        for i in range(len(avg_colors_images)):
             distance = self._get_distance_between_pixels(
-                pixel, self._avg_colors_images[i]
+                pixel, avg_colors_images[i]
             )
 
             if distance < min_delta:
@@ -152,7 +152,8 @@ class MosaicCreator:
             for w in range(old_image.width):
                 pixel = old_image.getpixel((w, h))
                 closest_image_ids = self._find_index_of_closest_by_avg_color_image(
-                    pixel
+                    pixel,
+                    self._avg_colors_images
                 )
                 new_image_pixels.append(closest_image_ids)
 
